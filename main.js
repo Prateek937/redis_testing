@@ -55,16 +55,17 @@ function main(nodes, next) {
         },
         next => wait(10, next),
         next => count(next),
-        next => {
-            console.log("2 > REBALANCING CLUSTER...\n\n");
-            const st1 = Date.now()
-            rebalance.rebalanceCluster(nodes.node2.ip, nodes.node2.port, (err, result) => {
-                if (err) return next(err);
-                console.log(`${result}\n`);
-                printTime(Date.now()-st1);
-                next(null);
-            });
-        },
+        //COMMENTED BECAUSE GIVES ERROR WITH 1000 KEYS
+        // next => {
+        //     console.log("2 > REBALANCING CLUSTER...\n\n");
+        //     const st1 = Date.now()
+        //     rebalance.rebalanceCluster(nodes.node2.ip, nodes.node2.port, (err, result) => {
+        //         if (err) return next(err);
+        //         console.log(`${result}\n`);
+        //         printTime(Date.now()-st1);
+        //         next(null);
+        //     });
+        // },
         next => wait(10, next),
         next => count(next),
         next => {

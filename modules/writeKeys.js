@@ -10,7 +10,6 @@ module.exports.writeKeysToSingleMaster = (nodes, keyCount, next) => {
             if (result.includes('MOVED')) {
                 count++;
                 let [newHost, newPort] = result.split(' ')[2].split(':')
-                console.log({newHost, newPort})
                 let command = `redis-cli -h ${newHost.trim()} -p ${newPort.trim()} SET key${i} value${i}`;
                 run(command, (err, result2) => {
                     if (err) return next(err);
