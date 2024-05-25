@@ -52,6 +52,8 @@
       - make
       - net-tools
       - python3-pip
+      - nodejs
+      - npm
     become: true
 
   - name: Install redis-py-cluster
@@ -63,6 +65,10 @@
       repo: "https://github.com/Prateek937/redis_testing.git"
       dest: "{{home}}/testing"
 
+  - name: Install npm packages
+    npm:
+      path: "{{home}}/testing"
+      
   - name: Download redis-stable zip file
     get_url:
       url: "{{redis_url}}"

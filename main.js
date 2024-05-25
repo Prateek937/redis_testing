@@ -1,4 +1,3 @@
-const { json } = require('stream/consumers');
 const addNode = require('./modules/addNode');
 const countSlotKeys = require('./modules/countSlotKeys');
 const createCluster = require('./modules/createCluster');
@@ -6,11 +5,12 @@ const rebalance = require('./modules/rebalance');
 const removeMaster = require('./modules/removeMaster');
 const reshard = require('./modules/reshard');
 const writeKeys = require('./modules/writeKeys');
+const async = require('async');
 
 const KEYCOUNT = 1000;
 
 function printTime(timeTaken){
-    console.log(`Time Taken: ${timeTaken} seconds...`);
+    console.log(`Time Taken: ${timeTaken/1000} seconds...`);
 }
 
 function wait(seconds, next) {
@@ -22,7 +22,7 @@ function wait(seconds, next) {
 
 function count(next) {
     console.log(`COUNT NODES\n\n`);
-    countSlotKeys.countSlotKeys(nodes.node1.ip, nodes.node1.port, (err, result) => {
+    countSlotKeys.countSlotKey(nodes.node1.ip, nodes.node1.port, (err, result) => {
         if (err) return next(err);
         console.log(`${result}\n`);
         next(null);
@@ -116,7 +116,7 @@ function main(nodes, next) {
         next => wait(5, next),
         next => count(next),
         next => {
-            console.log("7 > REMOVIING 4TH NODE FROM CLUSTER...\n\n");
+            console.log("7 > REMOVING 4TH NODE FROM CLUSTER...\n\n");
             const st1 = Date.now()
             removeMaster.removeMaster(nodes.node4.ip, nodes.node4.port, (err, result) => {
                 if (err) return next(err);
@@ -133,8 +133,7 @@ function main(nodes, next) {
     ], next);
 }
 
-file = open("./inventory.json")
-nodes = json.load(file)
+nodes = require('./inventory.json')
 main(nodes, (err, result) => {
     console.log('---done---', {err, result});
 })

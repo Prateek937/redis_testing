@@ -24,16 +24,16 @@ resource "aws_instance" "redis" {
       inline = ["echo 'Ready to connect!'"]
     }
 }
-resource "aws_instance" "redis_insight" {
-    ami                    = "ami-007020fd9c84e18c7"
-    instance_type          = "t2.micro"
-    subnet_id              = "subnet-07c5918859d627e1e"
-    vpc_security_group_ids = ["sg-1e994361"]
-    key_name               = "redis"
-    tags                   = {
-        "Name" : "Redis-insight"
-    }
-}
+# resource "aws_instance" "redis_insight" {
+#     ami                    = "ami-007020fd9c84e18c7"
+#     instance_type          = "t2.micro"
+#     subnet_id              = "subnet-07c5918859d627e1e"
+#     vpc_security_group_ids = ["sg-1e994361"]
+#     key_name               = "redis"
+#     tags                   = {
+#         "Name" : "Redis-insight"
+#     }
+# }
 
 resource "local_file" "inventory" {
   depends_on = [ aws_instance.redis ]
