@@ -1,0 +1,146 @@
+- hosts: all
+  gather_facts: no
+  vars:
+  - redis_url: "https://github.com/redis/redis/archive/refs/tags/7.2.4.tar.gz"
+  - rediszip_path: "/home/ubuntu/redis-stable.tar.gz"
+  - redis_path: "/home/ubuntu/redis-7.2.4"
+  - home: "/home/ubuntu"
+  - change_lines:
+    - key: "# cluster-enabled yes"
+      value: "cluster-enabled yes"
+    - key: "# cluster-node-timeout 15000"
+      value: "cluster-node-timeout 15000"
+    - key: "appendonly no"
+      value: "appendonly yes"
+    - key: "bind 127.0.0.1 -::1"
+      value: "#bind 127.0.0.1 -::1"
+    - key: "protected-mode yes"
+      value: "protected-mode no"
+  - config_files:
+    - redis1.conf: 
+      - key: "# cluster-config-file nodes-6379.conf" 
+        value: "cluster-config-file nodes-6379.conf"
+      - key: "port 6379"
+        value: "port 6379"
+    - redis2.conf:
+      - key: "# cluster-config-file nodes-6379.conf" 
+        value: "cluster-config-file nodes-6380.conf"
+      - key: "port 6379"
+        value: "port 6380"
+    - redis3.conf:
+      - key: "# cluster-config-file nodes-6379.conf" 
+        value: "cluster-config-file nodes-6381.conf"
+      - key: "port 6379"
+        value: "port 6381"
+    - redis4.conf:
+      - key: "# cluster-config-file nodes-6379.conf" 
+        value: "cluster-config-file nodes-6381.conf"
+      - key: "port 6379"
+        value: "port 6382"
+
+  tasks:
+  - name: Update System
+    apt:
+      update-cache: true
+    become: true
+
+  - name: Install prerequisites for redis
+    package:
+      name:
+      - tar
+      - gcc
+      - make
+      - net-tools
+      - python3-pip
+    become: true
+
+  - name: Install redis-py-cluster
+    pip:
+      name: redis-py-cluster
+  
+  - name: clone git repo
+    git:
+      repo: "https://github.com/Prateek937/redis_testing.git"
+      dest: "{{home}}/testing"
+
+  - name: Download redis-stable zip file
+    get_url:
+      url: "{{redis_url}}"
+      dest: "{{rediszip_path}}"
+
+  - name: "Extract Package {{rediszip_path}}"
+    unarchive:
+      src: "{{rediszip_path}}"
+      dest: "{{home}}"
+      remote_src: yes
+
+  - name: Run make distclean
+    command: make distclean
+    args:
+      chdir: "{{redis_path}}"
+
+  - name: Build the distclean target
+    make:
+      chdir: "{{redis_path}}"
+      target: distclean
+    ignore_errors: true
+
+  - name: change to the default target
+    make:
+      chdir: "{{redis_path}}"
+    ignore_errors: true
+
+  - name: Build the default target
+    make:
+      chdir: "{{redis_path}}"
+      target: install
+    become: true
+    ignore_errors: true
+
+  - name: Generate dummy configation files
+    copy:
+      src: "{{redis_path}}/redis.conf"
+      dest: "{{redis_path}}/{{item.keys() | first }}"
+      remote_src: true
+    loop: "{{config_files }}"
+
+  - name: Cofiguring redis common configurations
+    lineinfile: 
+      path: "{{redis_path}}/{{item.1.keys() | first }}"
+      regexp: "{{item.0.key}}" 
+      line: "{{item.0.value}}"
+      backrefs: yes
+    loop: "{{ change_lines | product(config_files) }}"
+
+  - name: Cofiguring redis cluster config file
+    lineinfile: 
+      path: "{{redis_path}}/{{item.keys() | first }}"
+      regexp: "{{item[item.keys() | first].0.key}}" 
+      line: "{{item[item.keys() | first].0.value}}"
+      backrefs: yes
+    loop: "{{ config_files }}"
+
+  - name: Cofiguring redis port
+    lineinfile: 
+      path: "{{redis_path}}/{{item.keys() | first }}"
+      regexp: "{{item[item.keys() | first].1.key}}" 
+      line: "{{item[item.keys() | first].1.value}}"
+      backrefs: yes
+    loop: "{{ config_files }}"
+
+  - name: Start redis instances
+    shell: "{{redis_path}}/src/redis-server {{redis_path}}/{{item.keys() | first }} --daemonize yes"
+    loop: "{{ config_files }}"
+    ignore_errors: true
+
+  # - name: stop server
+  #   shell: redis-cli -h 127.0.0.1 -p 6379 shutdown
+  #   ignore_errors: true
+    
+  # - name: starting single server
+  #   shell: "{{redis_path}}/src/redis-server {{redis_path}}/redis1.conf --daemonize yes"
+  
+  - name: Create the cluster
+    shell: "redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381  --cluster-replicas 0 --cluster-yes"
+
+
