@@ -1,5 +1,6 @@
 const async = require('async');
 const {run} = require('./run');
+const Redis = require('ioredis')
 
 module.exports.writeKeysFromShell = (nodes, keyCount, next) => {
     let count = 0;
