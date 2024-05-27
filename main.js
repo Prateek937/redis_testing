@@ -46,7 +46,12 @@ function main(nodes, next) {
         next => {
             console.log(`2 > WRITING ${KEYCOUNT} KEYS...\n\n`);
             const st1 = Date.now()
-            writeKeys.writeKeysToSingleMaster(nodes, KEYCOUNT, (err, result) => {
+            writeKeys.writeKeys( [
+                { host: nodes.node1.ip, port: nodes.node1.port },
+                { host: nodes.node2.ip, port: nodes.node2.port },
+                { host: nodes.node3.ip, port: nodes.node3.port },
+                { host: nodes.node4.ip, port: nodes.node4.port },
+              ], KEYCOUNT, (err, result) => {
                 if (err) return next(err);
                 console.log(`${result}\n`);
                 printTime(Date.now()-st1);
