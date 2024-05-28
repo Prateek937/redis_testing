@@ -52,5 +52,5 @@ Thumbs.db
 *.backup
 *provider*
 *.hcl
-.terraform
+*.terraform*
 infra/terraform/multiple/inventory.json

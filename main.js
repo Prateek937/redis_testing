@@ -10,11 +10,11 @@ const async = require('async');
 const KEYCOUNT = 1000;
 
 function printTime(timeTaken){
-    console.log(`Time Taken: ${timeTaken/1000} seconds...`);
+    console.log(`Time Taken: ${timeTaken/1000} seconds...\n`);
 }
 
 function wait(seconds, next) {
-    console.log(`WAITING FOR ${seconds} seconds...`);
+    console.log(`WAITING FOR ${seconds} seconds...\n`);
     setTimeout(() => {
         next(null);
     }, seconds*1000);
