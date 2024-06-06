@@ -1,9 +1,8 @@
 provider "aws" {
     region = "ap-south-1"
 }
-
 resource "aws_instance" "redis" {
-    count = 4
+    count = 5
     ami                    = "ami-007020fd9c84e18c7"
     instance_type          = "t2.large"
     subnet_id              = "subnet-07c5918859d627e1e"
@@ -35,37 +34,53 @@ resource "aws_instance" "redis" {
 #     }
 # }
 
-resource "local_file" "inventory" {
-  depends_on = [ aws_instance.redis ]
-  filename = "./inventory.json"
-  content = <<EOT
-{
-  "node1": {
-    "ip": "${aws_instance.redis.0.private_ip}",
-    "port": 6379
-  },
-  "node2": {
-    "ip": "${aws_instance.redis.1.private_ip}",
-    "port": 6379
-  },
-  "node3": {
-    "ip": "${aws_instance.redis.2.private_ip}",
-    "port": 6379
-  },
-  "node4": {
-    "ip": "${aws_instance.redis.3.private_ip}",
-    "port": 6379
+output "redis" {
+  value = {
+    nodes = aws_instance.redis.*
   }
-}  
-EOT
 }
 
-resource "null_resource" "run_ansible" {
-    depends_on = [ aws_instance.redis ]
-    triggers = {
-      always_run = timestamp()
-    }
-    provisioner "local-exec" {
-        command = "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${aws_instance.redis.0.public_ip},${aws_instance.redis.1.public_ip},${aws_instance.redis.2.public_ip},${aws_instance.redis.3.public_ip},' -u ubuntu --private-key ../../redis.pem ../../ansible/multiple/redis.yml"
-    }
+locals {
+  redis_instances =  aws_instance.redis.*
+  instance_details_json = jsonencode(local.redis_instances)
 }
+
+resource "local_file" "inventory" {
+  depends_on = [ aws_instance.redis]
+  filename = "./inventory.json"
+  content = "${local.instance_details_json}"
+}
+# resource "local_file" "inventory" {
+#   depends_on = [ aws_instance.redis ]
+#   filename = "./inventory.json"
+#   content = <<EOT
+# {
+#   "node1": {
+#     "ip": "${aws_instance.redis.0.private_ip}",
+#     "port": 6379
+#   },
+#   "node2": {
+#     "ip": "${aws_instance.redis.1.private_ip}",
+#     "port": 6379
+#   },
+#   "node3": {
+#     "ip": "${aws_instance.redis.2.private_ip}",
+#     "port": 6379
+#   },
+#   "node4": {
+#     "ip": "${aws_instance.redis.3.private_ip}",
+#     "port": 6379
+#   }
+# }  
+# EOT
+# }
+
+# resource "null_resource" "run_ansible" {
+#     depends_on = [ aws_instance.redis ]
+#     triggers = {
+#       always_run = timestamp()
+#     }
+#     provisioner "local-exec" {
+#         command = "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${aws_instance.redis.0.public_ip},${aws_instance.redis.1.public_ip},${aws_instance.redis.2.public_ip},${aws_instance.redis.3.public_ip},' -u ubuntu --private-key ../../redis.pem ../../ansible/multiple/redis.yml"
+#     }
+# }

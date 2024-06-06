@@ -69,6 +69,11 @@
     npm:
       path: "{{home}}/testing"
 
+  - name: Copy inventory.json
+    copy:
+      src: "../../terraform/multiple/inventory.json"
+      dest: "{{home}}/testing"
+      
   - name: Download redis-stable zip file
     get_url:
       url: "{{redis_url}}"

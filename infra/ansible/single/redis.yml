@@ -68,6 +68,11 @@
   - name: Install npm packages
     npm:
       path: "{{home}}/testing"
+  
+  - name: Copy inventory.json
+    copy:
+      src: "../../terraform/single/inventory.json"
+      dest: "{{home}}/testing"
       
   - name: Download redis-stable zip file
     get_url:

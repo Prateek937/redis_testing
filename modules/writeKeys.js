@@ -26,10 +26,11 @@ module.exports.writeKeysFromShell = (nodes, keyCount, next) => {
 
 module.exports.writeKeys = (clusterNodes, keyCount, next) => {
     const cluster = new Redis.Cluster(clusterNodes);
-    async.timesSeries(keyCount/1000000, (i, next) => 
-        async.times(1000000, (j, next) => {
-            let key = `key${j+i*1000000}`;
-            let value = `value${j+i*1000000}`;
+    const atOnce = keyCount < 1000000 ? keyCount : 1000000
+    async.timesSeries(keyCount/atOnce, (i, next) => 
+        async.times(atOnce, (j, next) => {
+            let key = `key${j+i*atOnce}`;
+            let value = `value${j+i*atOnce}`;
             cluster.set(key, value, (err, result) => {
                 if (err) {
                 console.error(`Error setting ${key}:`, err);

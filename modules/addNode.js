@@ -1,7 +1,7 @@
 const {run} = require('./run');
 
-module.exports.addMaster = (node1, port1, node2, port2, next) => {
-    const command = `redis-cli --cluster add-node ${node2}:${port2} ${node1}:${port1}`;
+module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
+    const command = `redis-cli --cluster add-node ${nodeToAdd.ip}:${nodeToAdd.port} ${clusterNode.ip}:${clusterNode.port}`;
     run(command, (err, result) => {
         if (err) return next(err);
         const lines = result.split('\n');

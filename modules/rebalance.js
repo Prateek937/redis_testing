@@ -7,6 +7,7 @@ module.exports.rebalanceCluster = (node, port, next) => {
         const lines = result.split('\n');
         for (let line of lines) {
             if (line.includes("Rebalancing")) return next(null, line);
+            if (line.includes("No rebalancing needed!")) return next(null, line);
         }
         next(`ERROR >>> ${result}`);
     });
