@@ -7,6 +7,7 @@ const reshard = require('./modules/reshard');
 const writeKeys = require('./modules/writeKeys');
 const processInventory = require('./modules/processInventory');
 const async = require('async');
+const { run } = require('./modules/run');
 
 const KEYCOUNT = 1000;
 
@@ -172,13 +173,22 @@ function main(nodes, next) {
     ], next);
 }
 
+let nodes;
 async.waterfall([
     next => processInventory.processInventory('../infra/terraform/multiple/inventory.json',next),
     next => {
-        let nodes = require('./inventory.json');
-        next(null, nodes);
+        nodes = require('./inventory.json');
+        next(null);
     },
-    (nodes, next) => main(nodes, next)
+    next => main(nodes, next),
+    next => {
+        let adhocInventory = '';
+        for (const key in nodes) {
+            let node = nodes[key];
+            adhocInventory += `${node.public_ip},`;
+        }
+        run(`ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${adhocInventory}' -u ubuntu --private-key ../infra/redis.pem ../infra/ansible/multiple/redis.yml`, next)
+    }
 ], (err, result) => {
     console.log('---done---', {err, result});
 })
