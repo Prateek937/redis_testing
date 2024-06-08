@@ -4,7 +4,7 @@ provider "aws" {
 resource "aws_instance" "redis" {
     count = 5
     ami                    = "ami-007020fd9c84e18c7"
-    instance_type          = "t2.large"
+    instance_type          = "t2.medium"
     subnet_id              = "subnet-07c5918859d627e1e"
     vpc_security_group_ids = ["sg-1e994361"]
     key_name               = "redis"
@@ -47,7 +47,7 @@ locals {
 
 resource "local_file" "inventory" {
   depends_on = [ aws_instance.redis]
-  filename = "./inventory.json"
+  filename = "./inventory_raw.json"
   content = "${local.instance_details_json}"
 }
 # resource "local_file" "inventory" {

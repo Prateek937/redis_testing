@@ -72,7 +72,7 @@
   - name: Copy inventory.json
     copy:
       src: "../../terraform/multiple/inventory.json"
-      dest: "{{home}}/testing"
+      dest: "{{home}}/testing/"
       
   - name: Download redis-stable zip file
     get_url:
