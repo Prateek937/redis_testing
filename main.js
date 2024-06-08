@@ -35,7 +35,10 @@ function main(nodes, next) {
         // create the cluster
         next => {
             console.log("1 > CREATING CLUSTER OF THREE EMPTY NODES...\n\n");
-            createCluster.createCluster(nodes, (err, result) => {
+            const entries = Object.entries(nodes);
+            entries.pop();
+            const clusterNodes = Object.fromEntries(entries);
+            createCluster.createCluster(clusterNodes, (err, result) => {
                 if (err) return next(err);
                 console.log(`${result}\n`);
                 printTime(Date.now()-t1);
