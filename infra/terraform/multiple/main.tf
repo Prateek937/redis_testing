@@ -1,8 +1,12 @@
 provider "aws" {
     region = "ap-south-1"
 }
+variable "max" {
+  type = number
+  default = 4
+}
 resource "aws_instance" "redis" {
-    count = 5
+    count = max
     ami                    = "ami-007020fd9c84e18c7"
     instance_type          = "t2.medium"
     subnet_id              = "subnet-07c5918859d627e1e"

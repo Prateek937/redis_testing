@@ -5,8 +5,8 @@ const rebalance = require('./modules/rebalance');
 const removeMaster = require('./modules/removeMaster');
 const reshard = require('./modules/reshard');
 const writeKeys = require('./modules/writeKeys');
+const flushdb = require('./modules/flushdb');
 const async = require('async');
-
 const KEYCOUNT = 1000;
 
 function printTime(timeTaken){
@@ -47,6 +47,13 @@ function main(nodes, next) {
         }, 
         //flush the keys
         next => wait(10, next),
+        next => count(next),
+        next => {
+            const entries = Object.entries(nodes);
+            entries.pop();
+            const clusterNodes = Object.fromEntries(entries);
+            flushdb.flushall(clusterNodes, next);
+        },
         next => count(next),
         // write n keys
         next => {
@@ -175,6 +182,7 @@ function main(nodes, next) {
 }
 
 const nodes = require('./inventory.json');
+const { flushall } = require('./modules/flushdb');
 main(nodes, (err, result) => {
     console.log('---done---', {err, result});
 })

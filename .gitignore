@@ -54,3 +54,4 @@ Thumbs.db
 *.hcl
 *.terraform*
 infra/terraform/multiple/inventory.json
+infra/terraform/multiple/inventory_raw.json
