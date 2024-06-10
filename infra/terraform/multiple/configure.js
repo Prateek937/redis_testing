@@ -1,6 +1,9 @@
 const file = require('fs');
 const {run} = require('../../../modules/run');
 const async = require('async');
+const { isPromise } = require('util/types');
+
+
 const processInventory = (inventory, next) => {
     const nodes = require(inventory);
     let content = {};
@@ -32,3 +35,4 @@ async.series([
     },
     next => runAnsible(nodes, next),
 ], (err, result) => console.log('---done---', {err, result}));
+

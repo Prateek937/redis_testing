@@ -3,10 +3,10 @@ provider "aws" {
 }
 variable "max" {
   type = number
-  default = 4
+  default = 5
 }
 resource "aws_instance" "redis" {
-    count = max
+    count = var.max
     ami                    = "ami-007020fd9c84e18c7"
     instance_type          = "t2.medium"
     subnet_id              = "subnet-07c5918859d627e1e"
@@ -54,6 +54,8 @@ resource "local_file" "inventory" {
   filename = "./inventory_raw.json"
   content = "${local.instance_details_json}"
 }
+
+
 # resource "local_file" "inventory" {
 #   depends_on = [ aws_instance.redis ]
 #   filename = "./inventory.json"

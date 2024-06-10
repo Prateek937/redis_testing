@@ -8,15 +8,15 @@ const float = function(...args) {
 	}
 };
 
-module.exports.reshard = (clusterNode, lastNode, next) => {
-    const clusterToIdCommand = `redis-cli -h ${clusterNode.ip} -p ${clusterNode.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
-    const clusterFromIdCommand = `redis-cli -h ${lastNode.ip} -p ${lastNode.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
+module.exports.reshard = (reshardTo, reshardFrom, next) => {
+    const clusterToIdCommand = `redis-cli -h ${reshardTo.private_ip} -p ${reshardTo.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
+    const clusterFromIdCommand = `redis-cli -h ${reshardFrom.private_ip} -p ${reshardFrom.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
 
     waterfall([
         next => run(clusterToIdCommand, (err, result) => err ? next(err) : next(null, result.trim())),
         (clusterToId, next) => run(clusterFromIdCommand, float(clusterToId, next)),
         (clusterToId, clusterFromId, next) => {
-            const finalCommand = `redis-cli --cluster reshard ${lastNode.ip}:${lastNode.port} --cluster-from ${clusterFromId.trim()} --cluster-to ${clusterToId} --cluster-slots 4096 --cluster-yes | grep Ready`;
+            const finalCommand = `redis-cli --cluster reshard ${reshardFrom.private_ip}:${reshardFrom.port} --cluster-from ${clusterFromId.trim()} --cluster-to ${clusterToId} --cluster-slots 4096 --cluster-yes | grep Ready`;
             run(finalCommand, (err, result) => err ? next(err) : next(null, result.trim()))
         }
     ], next);
