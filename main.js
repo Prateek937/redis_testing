@@ -84,7 +84,7 @@ function main(nodes, params, next) {
         },
         next => wait(10, next),
         next => count(next),
-        // adding nodes
+        // // adding nodes
         next => {
             console.log(`> ADDING ${params.transitionNodes - params.currentNodes} NODE TO CLUSTER...\n\n`);
             const st1 = Date.now()
@@ -94,18 +94,19 @@ function main(nodes, params, next) {
                 port: nodes.node1.port
             };
             async.eachOf(addNodes, (node, key, next) => {
-                console.log(node);
                 addNode.addMaster(clusterNode, node, (err, result) => {
+                    console.log(node);
                     if (err) return next(err);
                     console.log(`${result}\n`);
                     printTime(Date.now()-st1);
                     next(null);
                 });
+
             }, next);
         },
-        next => wait(5, next),
-        next => count(next),
-        // rebalance cluster
+        // next => wait(5, next),
+        // next => count(next),
+        // // rebalance cluster
         next => {
             console.log("4 > REBALANCING CLUSTER...\n\n");
             const nodeList = Object.keys(nodes);
@@ -119,17 +120,17 @@ function main(nodes, params, next) {
         }, 
         next => wait(10, next),
         next => count(next),
-        // reshard cluster
+        // // reshard cluster
         next => {
             console.log("> RESHARD CLUSTER...\n\n");
             const st1 = Date.now()
             const reshardNodes = Object.fromEntries(Object.entries(nodes).slice(params.finalNodes, params.transitionNodes))
             const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, params.finalNodes))
 
-            async.times(Object.keys(reshardNodes).length, (i, next) => {
-                console.log('Reshard Node:', reshardNodes[Object.keys(reshardNodes)[i]]);
-                console.log('Cluster Node', clusterNodes[Object.keys(clusterNodes)[i]]);
+            async.timesSeries(Object.keys(reshardNodes).length, (i, next) => {
                 reshard.reshard(clusterNodes[Object.keys(clusterNodes)[i]], reshardNodes[Object.keys(reshardNodes)[i]], (err, result) => {
+                    console.log('Reshard Node:', reshardNodes[Object.keys(reshardNodes)[i]]);
+                    console.log('Cluster Node', clusterNodes[Object.keys(clusterNodes)[i]]);
                     if (err) return next(err);
                     console.log(`${result}\n`); 
                     printTime(Date.now()-st1);
@@ -171,8 +172,8 @@ function main(nodes, params, next) {
             }, next);
             
         },
-        next => count(next),
-        // print time taken
+        // next => count(next),
+        // // print time taken
         next => {
             printTime(Date.now() - t1);
             next(null);
