@@ -1,27 +1,32 @@
 {
   "node1": {
-    "private_ip": "172.31.5.40",
-    "public_ip": "65.2.190.54",
+    "private_ip": "172.31.5.72",
+    "public_ip": "52.66.117.250",
     "port": 6379
   },
   "node2": {
-    "private_ip": "172.31.5.167",
-    "public_ip": "3.110.86.52",
+    "private_ip": "172.31.5.27",
+    "public_ip": "52.66.28.226",
     "port": 6379
   },
   "node3": {
-    "private_ip": "172.31.5.131",
-    "public_ip": "65.2.29.98",
+    "private_ip": "172.31.5.243",
+    "public_ip": "3.110.184.232",
     "port": 6379
   },
   "node4": {
-    "private_ip": "172.31.5.37",
-    "public_ip": "3.111.150.38",
+    "private_ip": "172.31.5.223",
+    "public_ip": "13.233.215.204",
     "port": 6379
   },
   "node5": {
-    "private_ip": "172.31.5.223",
-    "public_ip": "15.206.94.95",
+    "private_ip": "172.31.5.162",
+    "public_ip": "13.234.18.39",
+    "port": 6379
+  },
+  "node6": {
+    "private_ip": "172.31.5.163",
+    "public_ip": "13.234.18.39",
     "port": 6379
   }
 }

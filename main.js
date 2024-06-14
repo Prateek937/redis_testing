@@ -104,14 +104,14 @@ function main(nodes, params, next) {
 
             }, next);
         },
-        // next => wait(5, next),
-        // next => count(next),
+        next => wait(5, next),
+        next => count(next),
         // // rebalance cluster
         next => {
             console.log("4 > REBALANCING CLUSTER...\n\n");
             const nodeList = Object.keys(nodes);
             const st1 = Date.now()
-            rebalance.rebalanceCluster(nodes.node1.private_ip, nodes.node2.port, (err, result) => {
+            rebalance.rebalanceCluster(nodes[Object.keys(nodes)[params.currentNodes]].private_ip, nodes[Object.keys(nodes)[params.currentNodes]].port, (err, result) => {
                 if (err) return next(err);
                 console.log(`${result}\n`);
                 printTime(Date.now()-st1);

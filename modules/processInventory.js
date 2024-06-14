@@ -1,4 +1,3 @@
-const file = require('fs');
 
 module.exports.processInventory = (inventory, next) => {
     const nodes = require(inventory);
