@@ -5,7 +5,7 @@ variable "max" {
   type = number
   default = 5
 }
-resource "aws_instance" "redis" {
+resource "aws_instance" "x" {
     count = var.max
     ami                    = "ami-007020fd9c84e18c7"
     instance_type          = "t2.medium"
@@ -40,17 +40,17 @@ resource "aws_instance" "redis" {
 
 output "redis" {
   value = {
-    nodes = aws_instance.redis.*
+    nodes = aws_instance.x.*
   }
 }
 
 locals {
-  redis_instances =  aws_instance.redis.*
+  redis_instances =  aws_instance.x.*
   instance_details_json = jsonencode(local.redis_instances)
 }
 
 resource "local_file" "inventory" {
-  depends_on = [ aws_instance.redis]
+  depends_on = [ aws_instance.x]
   filename = "./inventory_raw.json"
   content = "${local.instance_details_json}"
 }
