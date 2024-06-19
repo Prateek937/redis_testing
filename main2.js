@@ -34,7 +34,7 @@ function wait(seconds, next) {
 }
 
 function count(next) {
-    console.log(`COUNT NODES\n\n`);
+    console.log(`> COUNT NODES...\n\n`);
     countSlotKeys.countSlotKey(nodes.node1.private_ip, nodes.node1.port, (err, result) => {
         if (err) return next(err);
         console.log(`${result}\n`);
@@ -49,7 +49,7 @@ function reverse(object) {
 }
 
 function createClusterofThreeNodes(next) {
-    console.log(`> CREATING CLUSTER OF 3 NODES...\n\n`);
+    console.log(`CREATING CLUSTER OF 3 NODES---------------------------------\n\n`);
     const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, 3));
     console.log({ clusterNodes });
     async.series([
@@ -79,10 +79,11 @@ function rebalanceCluster(node, next) {
 }
 
 function reshardNode(nodeFrom, nodeTo, next) {
-    console.log(`> RESHARDING ${nodeFrom.private_ip}...\n\n`);
+    console.log(`> RESHARDING FROM ${nodeFrom.private_ip} TO ${nodeFrom.private_ip}...\n\n`);
     const st1 = Date.now();
     reshard.reshard(nodeTo, nodeFrom, (err, result) => {
         if (err) return next(err);
+        console.log(`> RESHARDED ${nodeFrom.private_ip}...\n\n`);
         console.log(`${result}\n`);
         printTime(Date.now() - st1);
         next(null);
@@ -138,9 +139,11 @@ function flushCluster(next) {
 }
 
 function minimizeClusterToThreeNodes(next) {
+    console.log(`MINIMIZING CLUSTER TO 3 NODES------------------------\n\n`)
     async.series([
         // flush the current cluster
         next => flushCluster(next),
+        next => count(next),
         // reshard -diff nodes, always take from the highest and put to the lowest
         next => {
             const nodesFrom = reverse(Object.fromEntries(Object.entries(nodes).slice(3, latest)));
@@ -164,6 +167,7 @@ function minimizeClusterToThreeNodes(next) {
 
 function resizeCluster(nodeCount, next) {
     if (nodeCount < min || nodeCount > max) return next(error);
+    console.log(`RESIZING CLUSTER FROM ${latest} TO ${nodeCount} NODES------------------------\n\n`)
     const diff = nodeCount - latest;
     if (diff < 0) async.series([
         // reshard -diff nodes, always take from the highest and put to the lowest
@@ -178,12 +182,9 @@ function resizeCluster(nodeCount, next) {
         // delete -diff nodes, always delete the highest
         next => {
             const removeNodes = reverse(Object.fromEntries(Object.entries(nodes).slice(nodeCount, latest)));
-            async.eachOf(removeNodes, (node, nodeName, next) => removeNode(node.private_ip, node.port, next), (err, result) => {
-                if (err) return next(err);
-                latest = latest-1;
-                file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next);
-            });
+            async.eachOf(removeNodes, (node, nodeName, next) => removeNode(node.private_ip, node.port, next), next);
         },
+        next => file.writeFile('./latest.json', JSON.stringify({ latest: nodeCount }, null, 2), next),
         next => count(next),
         // rebalance
         next => rebalanceCluster(nodes[Object.keys(nodes)[nodeCount - 1]], next),
@@ -199,12 +200,9 @@ function resizeCluster(nodeCount, next) {
         // add diff nodes, always add the highest
         next => {
             const addNodes = Object.fromEntries(Object.entries(nodes).slice(latest, nodeCount));
-            async.eachOf(addNodes, (node, key, next) => addMasterNode(nodes.node1, node, next), (err, result) => {
-                if (err) return next(err);
-                latest = latest+1;
-                file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next);
-            });
+            async.eachOf(addNodes, (node, key, next) => addMasterNode(nodes.node1, node, next), next);
         },
+        next => file.writeFile('./latest.json', JSON.stringify({ latest: nodeCount }, null, 2), next),
         next => wait(5, next),
         next => count(next),
         // rebalance

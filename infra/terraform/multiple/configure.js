@@ -23,7 +23,11 @@ const runAnsible = (nodes, next) => {
     //     adhocInventory += `${node.public_ip},`;
     // }
     async.eachOf(nodes, (item, key, next) => {
-        run(`ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ../../redis.pem ../../ansible/multiple/redis.yml`, next)
+        run(`ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ../../redis.pem ../../ansible/multiple/redis.yml`, (err, result)=>{
+            if (err) next(err);
+            console.log(result);
+            next(null);
+        });
     }, next);
 }
 
