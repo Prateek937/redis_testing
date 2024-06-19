@@ -17,12 +17,14 @@ const processInventory = (inventory, next) => {
 }
 
 const runAnsible = (nodes, next) => {
-    let adhocInventory = '';
-    for (const key in nodes) {
-        let node = nodes[key];
-        adhocInventory += `${node.public_ip},`;
-    }
-    run(`ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${adhocInventory}' -u ubuntu --private-key ../../redis.pem ../../ansible/multiple/redis.yml`, next);
+    // let adhocInventory = '';
+    // for (const key in nodes) {
+    //     let node = nodes[key];
+    //     adhocInventory += `${node.public_ip},`;
+    // }
+    async.eachOf(nodes, (item, key, next) => {
+        run(`ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ../../redis.pem ../../ansible/multiple/redis.yml`, next)
+    }, next);
 }
 
 let nodes;

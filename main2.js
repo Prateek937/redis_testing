@@ -9,9 +9,11 @@ const removeMaster = require('./modules/removeMaster');
 const reshard = require('./modules/reshard');
 const writeKeys = require('./modules/writeKeys');
 const flushdb = require('./modules/flushdb');
+const inputs = require('./inputs');
 
-const min = 3;
-const max = 10;
+
+const min = inputs.min;
+const max = inputs.max;
 const nodes = require('./inventory.json');
 let latest;
 try {
@@ -168,6 +170,7 @@ function resizeCluster(nodeCount, next) {
         next => {
             const nodesFrom = reverse(Object.fromEntries(Object.entries(nodes).slice(nodeCount, latest)));
             const nodesTo = Object.fromEntries(Object.entries(nodes).slice(0, nodeCount))
+            //try parallaly as well
             async.timesSeries(Object.keys(nodesFrom).length, (i, next) => reshardNode(nodesFrom[Object.keys(nodesFrom)[i]], nodesTo[Object.keys(nodesTo)[i % nodeCount]], next), next)
         },
         next => wait(10, next),
@@ -212,22 +215,28 @@ function resizeCluster(nodeCount, next) {
     else next(null);
 }
 
-const changes = [{ type: "init", }, { type: "resize", value: 6 }, { type: "write", value: 1000 }, { type: "flush", value: null }, { type: "resize", value: 3 }]
 const startTime = Date.now();
-async.eachOfSeries(changes, (change, key, next) => {
-    switch (change.type) {
-        case 'init': {
-            console.log({latest});
-            if (latest < 3) createClusterofThreeNodes(next);
-            if (latest > 3) minimizeClusterToThreeNodes(next);
-            next(null);
-            break;
+async.series([
+    next => count(next),
+    next => async.eachOfSeries(inputs.changes, (change, key, next) => {
+        switch (change.type) {
+            case 'init': {
+                console.log({latest});
+                if (latest < 3) createClusterofThreeNodes(next);
+                if (latest > 3) minimizeClusterToThreeNodes(next);
+                if (latest === 3) next(null);
+                break;
+            }
+            case 'write': {addKeys(change.value, next); break;}
+            case 'flush': {flushCluster(next); break;}
+            case 'resize': {resizeCluster(change.value, next); break;}
+            default: next(`Unknown operation ${change.type}`)
         }
-        case 'write': {addKeys(change.value, next); break;}
-        case 'flush': {flushCluster(next); break;}
-        case 'resize': {resizeCluster(change.value, next); break;}
-        default: next(`Unknown operation ${change.type}`)
-    }
-}, console.log);
-printTime(Date.now() - startTime);
+    }, next)
+], (...args) => {
+    printTime(Date.now() - startTime);
+    console.log('---DONE---', ...args);
+});
+
+
 
