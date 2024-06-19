@@ -64,6 +64,7 @@
     git:
       repo: "https://github.com/Prateek937/redis_testing.git"
       dest: "{{home}}/testing"
+      force: true
 
   - name: Install npm packages
     npm:

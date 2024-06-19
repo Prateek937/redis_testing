@@ -202,11 +202,14 @@ function resizeCluster(nodeCount, next) {
     else if (diff > 0) async.series([
         // add diff nodes, always add the highest
         next => {
-            const addNodes = Object.fromEntries(Object.entries(nodes).slice(latest, nodeCount));\
+            const addNodes = Object.fromEntries(Object.entries(nodes).slice(latest, nodeCount));
             //doing in series because if one node fails to add, remaining are added then if we run it again it creates problems
             async.eachOfSeries(addNodes, (node, key, next) => addMasterNode(nodes.node1, node, next), next);
         },
-        next => file.writeFile('./latest.json', JSON.stringify({ latest: nodeCount }, null, 2), next),
+        next => {
+            latest = nodeCount;
+            file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next)
+        },
         next => wait(5, next),
         next => count(next),
         // rebalance
