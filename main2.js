@@ -10,7 +10,6 @@ const reshard = require('./modules/reshard');
 const writeKeys = require('./modules/writeKeys');
 const flushdb = require('./modules/flushdb');
 
-
 const min = 3;
 const max = 10;
 const nodes = require('./inventory.json');
@@ -19,7 +18,6 @@ try {
 } catch (err) {
     let latest = 0;
 }
-
 
 function printTime(timeTaken){
     console.log(`Time Taken: ${timeTaken/1000} seconds...\n`);
@@ -47,7 +45,7 @@ function reverse(object) {
     return reversed;
 }
 
-function createCluster(clusterNodes, next) {
+function createClusterofThreeNodes(clusterNodes, next) {
     console.log(`> CREATING CLUSTER OF ${Object.keys(clusterNodes).length} NODES...\n\n`);
     console.log({clusterNodes});
     cluster.createCluster(clusterNodes, (err, result) => {
@@ -217,19 +215,12 @@ function resizeCluster(count, next) {
     else next(null);
 }
 
-const changes = [{type: "minimize", },{type: "resize", value: 4}, {type: "write", value: 100000}, {type: "flush", value: null}]
+const changes = [{type: "init", },{type: "resize", value: 4}, {type: "write", value: 100000}, {type: "flush", value: null}]
 const startTime = Date.now();
 async.eachOfSeries(changes, (change, key, next) => {
     switch (change.type) {
-        case 'cluster': {
-            if (latest >= 3) return next(`Seems like cluster is already created. Try minimizing it.`);
-            createCluster(change.value, next);
-        }
-        case 'minimize': {
-            if (latest < 3) {
-                console.log(`Cluster is already mininized to three nodes.`); 
-                next(null);
-            }
+        case 'init': {
+            if (latest < 3) createClusterofThreeNodes(3, next);
             minimizeClusterToThreeNodes(next);
         }
         case 'write': addKeys(change.value, next);
