@@ -10,5 +10,8 @@ module.exports.removeMaster = (node, port, next) => {
             const resultCommand = `redis-cli --cluster del-node ${node}:${port} ${nodeId}`
             run(resultCommand, (err, result) => err ? next(err) : next(null, result.trim()));
         }
-    ], next);
+    ],  (err, result) => {
+        if(err) return next(err);
+        next(null, `removed successfully!`);
+    });
 }

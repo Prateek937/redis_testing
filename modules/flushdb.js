@@ -4,5 +4,8 @@ module.exports.flushall = (nodes, next) => {
     async.eachOf(nodes, (node, nodeName, next) => {
         const command = `redis-cli -h ${node.private_ip} -p ${node.port} flushall`;
         run(command, next);
-    }, next);
+    }, (err) => {
+        if (err) return next(err);
+        next(null, 'flushed successfully!');
+    });
 }

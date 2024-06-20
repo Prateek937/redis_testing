@@ -17,7 +17,7 @@ module.exports.reshard = (reshardTo, reshardFrom, next) => {
         (clusterToId, next) => run(clusterFromIdCommand, float(clusterToId, next)),
         (clusterToId, clusterFromId, next) => {
             const finalCommand = `redis-cli --cluster reshard ${reshardFrom.private_ip}:${reshardFrom.port} --cluster-from ${clusterFromId.trim()} --cluster-to ${clusterToId} --cluster-slots 4096 --cluster-yes | grep Ready`;
-            run(finalCommand, (err, result) => err ? next(err) : next(null, result.trim()))
+            run(finalCommand, (err, result) => err ? next(err) : next(null, 'resharded successfully!'));
         }
     ], next);
 }

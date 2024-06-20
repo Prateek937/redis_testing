@@ -34,7 +34,7 @@ function wait(seconds, next) {
 }
 
 function count(next) {
-    console.log(`> COUNT NODES...\n\n`);
+    console.log(`### COUNT NODES ###\n`);
     countSlotKeys.countSlotKey(nodes.node1.private_ip, nodes.node1.port, (err, result) => {
         if (err) return next(err);
         console.log(`${result}\n`);
@@ -49,14 +49,14 @@ function reverse(object) {
 }
 
 function createClusterofThreeNodes(next) {
-    console.log(`CREATING CLUSTER OF 3 NODES---------------------------------\n\n`);
+    console.log(`### CREATING CLUSTER OF 3 NODES ###\n`);
     const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, 3));
     console.log({ clusterNodes });
     async.series([
         next => cluster.createCluster(clusterNodes, (err, result) => {
             if (err) return next(err);
             console.log(`${result}\n`);
-            console.log("> FLUSHING DATABASE...\n\n");
+            console.log("### FLUSHING DATABASE ###\n");
             printTime(Date.now() - startTime);
             flushdb.flushall(clusterNodes, next);
         }),
@@ -68,7 +68,7 @@ function createClusterofThreeNodes(next) {
 }
 
 function rebalanceCluster(node, next) {
-    console.log("> REBALANCING CLUSTER...\n\n");
+    console.log("### REBALANCING CLUSTER ###\n");
     const st1 = Date.now()
     rebalance.rebalanceCluster(node.private_ip, node.port, (err, result) => {
         if (err) return next(err);
@@ -79,11 +79,10 @@ function rebalanceCluster(node, next) {
 }
 
 function reshardNode(nodeFrom, nodeTo, next) {
-    console.log(`> RESHARDING FROM ${nodeFrom.private_ip} TO ${nodeTo.private_ip}...\n\n`);
+    console.log(`### RESHARDING FROM ${nodeFrom.private_ip} TO ${nodeTo.private_ip} ###\n`);
     const st1 = Date.now();
     reshard.reshard(nodeTo, nodeFrom, (err, result) => {
         if (err) return next(err);
-        console.log(`> RESHARDED ${nodeFrom.private_ip}...\n\n`);
         console.log(`${result}\n`);
         printTime(Date.now() - st1);
         next(null);
@@ -91,7 +90,7 @@ function reshardNode(nodeFrom, nodeTo, next) {
 }
 
 function removeNode(host, port, next) {
-    console.log(`> REMOVING ${host}:${port} FROM CLUSTER...\n\n`);
+    console.log(`### REMOVING ${host}:${port} FROM CLUSTER ###\n`);
     const st1 = Date.now();
     removeMaster.removeMaster(host, port, (err, result) => {
         if (err) return next(err);
@@ -102,7 +101,7 @@ function removeNode(host, port, next) {
 }
 
 function addMasterNode(nodeTo, node, next) {
-    console.log(`> ADDING ${node.private_ip}:${node.port} NODE TO CLUSTER...\n\n`);
+    console.log(`### ADDING ${node.private_ip}:${node.port} NODE TO CLUSTER ###\n`);
     const st1 = Date.now();
     addNode.addMaster(nodeTo, node, (err, result) => {
         if (err) return next(err);
@@ -113,7 +112,7 @@ function addMasterNode(nodeTo, node, next) {
 }
 
 function addKeys(keys, next) {
-    console.log(`> WRITING ${keys} KEYS...\n\n`);
+    console.log(`### WRITING ${keys} KEYS ###\n`);
     const st1 = Date.now();
     let clusterNodes = [];
     const nodeList = Object.keys(nodes);
@@ -127,19 +126,19 @@ function addKeys(keys, next) {
         if (err) return next(err);
         console.log(`${result}\n`);
         printTime(Date.now() - st1);
-        next(null);
+        count(next);
     });
 }
 
 
 function flushCluster(next) {
-    console.log("> FLUSHING DATABASE...\n\n");
+    console.log("### FLUSHING DATABASE ###\n");
     const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, latest));
     flushdb.flushall(clusterNodes, next);
 }
 
 function minimizeClusterToThreeNodes(next) {
-    console.log(`MINIMIZING CLUSTER TO 3 NODES------------------------\n\n`)
+    // console.log(`MINIMIZING CLUSTER TO 3 NODES------------------------\n\n`)
     async.series([
         // flush the current cluster
         next => flushCluster(next),
@@ -167,7 +166,7 @@ function minimizeClusterToThreeNodes(next) {
 
 function resizeCluster(nodeCount, next) {
     if (nodeCount < min || nodeCount > max) return next(error);
-    console.log(`RESIZING CLUSTER FROM ${latest} TO ${nodeCount} NODES------------------------\n\n`)
+    // console.log(`RESIZING CLUSTER FROM ${latest} TO ${nodeCount} NODES------------------------\n\n`)
     const diff = nodeCount - latest;
     if (diff < 0) async.series([
         // reshard -diff nodes, always take from the highest and put to the lowest
@@ -213,7 +212,7 @@ function resizeCluster(nodeCount, next) {
         next => wait(5, next),
         next => count(next),
         // rebalance
-        next => rebalanceCluster(nodes[Object.keys(nodes)[nodeCount - 1]], next),
+        next => rebalanceCluster(nodes[Object.keys(nodes)[latest - 1]], next),
         next => wait(5, next),
         next => count(next),
     ], next);
@@ -222,7 +221,10 @@ function resizeCluster(nodeCount, next) {
 
 const startTime = Date.now();
 async.series([
-    next => count(next),
+    next => {
+        if (latest > 0) return next(null) ;
+        count(next);
+    },
     next => async.eachOfSeries(inputs.changes, (change, key, next) => {
         console.log(`\n******* ${change.type}, ${change.value} *******\n`)
         switch (change.type) {

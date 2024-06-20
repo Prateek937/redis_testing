@@ -6,7 +6,7 @@ module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
         if (err) return next(err);
         const lines = result.split('\n');
         for (let line of lines) {
-            if (line.includes("added")) return next(null, line);
+            if (line.includes("added")) return next(null, `added node successfully`);
         }
         next(`ERROR >>> ${result}`);
     });

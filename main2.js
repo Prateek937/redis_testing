@@ -79,7 +79,7 @@ function rebalanceCluster(node, next) {
 }
 
 function reshardNode(nodeFrom, nodeTo, next) {
-    console.log(`> RESHARDING FROM ${nodeFrom.private_ip} TO ${nodeFrom.private_ip}...\n\n`);
+    console.log(`> RESHARDING FROM ${nodeFrom.private_ip} TO ${nodeTo.private_ip}...\n\n`);
     const st1 = Date.now();
     reshard.reshard(nodeTo, nodeFrom, (err, result) => {
         if (err) return next(err);
@@ -127,7 +127,7 @@ function addKeys(keys, next) {
         if (err) return next(err);
         console.log(`${result}\n`);
         printTime(Date.now() - st1);
-        next(null);
+        count(next);
     });
 }
 
