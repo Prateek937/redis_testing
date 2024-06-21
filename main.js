@@ -181,7 +181,7 @@ function resizeCluster(nodeCount, next) {
         // delete -diff nodes, always delete the highest
         next => {
             const removeNodes = reverse(Object.fromEntries(Object.entries(nodes).slice(nodeCount, latest)));
-            async.eachOf(removeNodes, (node, nodeName, next) => removeNode(node.private_ip, node.port, next), next);
+            async.eachOfSeries(removeNodes, (node, nodeName, next) => removeNode(node.private_ip, node.port, next), next);
         },
         next => {
             latest = nodeCount;
@@ -222,14 +222,14 @@ function resizeCluster(nodeCount, next) {
 const startTime = Date.now();
 async.series([
     next => {
-        if (latest > 0) return next(null) ;
-        count(next);
+        console.log({ latest });
+        if (latest > 0) return count(next);;
+        next(null)
     },
     next => async.eachOfSeries(inputs.changes, (change, key, next) => {
         console.log(`\n******* ${change.type}, ${change.value} *******\n`)
         switch (change.type) {
             case 'init': {
-                console.log({latest});
                 if (latest < 3) return createClusterofThreeNodes(next);
                 if (latest > 3) return minimizeClusterToThreeNodes(next);
                 return flushCluster(next);
@@ -244,7 +244,6 @@ async.series([
     printTime(Date.now() - startTime);
     console.log('---DONE---', ...args);
 });
-
 
 // if latest  = 0 no count
 //count after writing
