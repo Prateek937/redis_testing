@@ -1,4 +1,5 @@
 const { execSync, exec} = require('child_process');
+const file = require('fs');
 
 module.exports.runSync = (command) => {
     try {
@@ -9,10 +10,14 @@ module.exports.runSync = (command) => {
     }
 }
 
-module.exports.run = (command, next) => exec(command, (err, stdout, stderr) => {
+module.exports.run = (command, next) => {
+    try {file.appendFileSync('commands.txt', command + '\n');}
+    catch (err) {file.writeFileSync('commands.txt', command + '\n');}
+
+    exec(command, (err, stdout, stderr) => {
     if (stderr) return next(stderr);
     next(null, stdout);
-})
+})}
 
 module.exports.applyCommand = (command, args, next) => {
     const out = spawn(command, args);

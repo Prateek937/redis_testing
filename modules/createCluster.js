@@ -11,6 +11,7 @@ module.exports.createCluster = (nodes, next) => {
     const command = `redis-cli --cluster create ${members.trim()} --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     run(command, (err, result) => {
         if (err) return next(err);
-        next(null, result)
+        if (result.includes('All nodes agree')) return next(null, 'cluster created successfully');
+        next(null, result);
     });
 }

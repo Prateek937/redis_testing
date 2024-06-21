@@ -42,7 +42,12 @@
   - name: Update System
     apt:
       update-cache: true
+      state: latest
     become: true
+
+  - name: Pause for 5 seconds
+    pause:
+      seconds: 5
 
   - name: Install prerequisites for redis
     package:

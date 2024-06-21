@@ -1,0 +1,20 @@
+start from scratch
+
+changes = [
+    { type: "init", }, 
+    { type: "resize", value: 4}, 
+    { type: "write", value: 1000 }, 
+    { type: "resize", value: 3 }
+]
+
+- tested 3 times
+- failed at the last
+- failed while resharding, says "fix your cluster first"
+- reason to this seems that the 4th is not added but it shows it shows it's added.
+
+
+---
+start with 3 nodes in the cluster
+
+total runs = 2
+failed at the second with the same 

@@ -251,11 +251,13 @@ async.series([
     console.log('---DONE---', ...args);
 });
 
-// if latest  = 0 no count
-//count after writing
-
 
 // 7* type value 7* - per change
 // 3# redisCommand, args, 3# - per redis instruction
 // success {redisCommand} or the error
 // Count - after every redis instruction
+
+
+// no need to store the latest. ask the clutster
+
+// log of output
