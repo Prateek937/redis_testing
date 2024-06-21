@@ -8,7 +8,7 @@ module.exports.createCluster = (nodes, next) => {
         members += `${node.private_ip}:${node.port} `;
     }
 
-    const command = `redis-cli --cluster create ${members.trim()} --cluster-replicas 0 --cluster-yes | grep OK`;
+    const command = `redis-cli --cluster create ${members.trim()} --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     run(command, (err, result) => {
         if (err) return next(err);
         next(null, result)

@@ -27,17 +27,24 @@ function printTime(timeTaken) {
 }
 
 function wait(seconds, next) {
-    console.log(`WAITING FOR ${seconds} seconds...\n`);
-    setTimeout(() => {
-        next(null);
-    }, seconds * 1000);
+    process.stdout.write(`waiting... `);
+    async.timesSeries(seconds, (i, next) => {
+        setTimeout(() => {
+            process.stdout.write(`${seconds - i} `);
+            next(null);
+        }, 1000);
+    }, (err, results) => {
+        if (err) return next(err);
+        console.log('\n');
+        next(null, results);
+    });
 }
 
 function count(next) {
     console.log(`### COUNT NODES ###\n`);
     countSlotKeys.countSlotKey(nodes.node1.private_ip, nodes.node1.port, (err, result) => {
         if (err) return next(err);
-        console.log(`${result}\n`);
+        console.log(`${result}`);
         next(null);
     });
 }
@@ -51,11 +58,10 @@ function reverse(object) {
 function createClusterofThreeNodes(next) {
     console.log(`### CREATING CLUSTER OF 3 NODES ###\n`);
     const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, 3));
-    console.log({ clusterNodes });
     async.series([
         next => cluster.createCluster(clusterNodes, (err, result) => {
             if (err) return next(err);
-            console.log(`${result}\n`);
+            console.log(`${result}`);
             console.log("### FLUSHING DATABASE ###\n");
             printTime(Date.now() - startTime);
             flushdb.flushall(clusterNodes, next);
@@ -72,7 +78,7 @@ function rebalanceCluster(node, next) {
     const st1 = Date.now()
     rebalance.rebalanceCluster(node.private_ip, node.port, (err, result) => {
         if (err) return next(err);
-        console.log(`${result}\n`);
+        console.log(`${result}`);
         printTime(Date.now() - st1);
         next(null);
     });
@@ -83,7 +89,7 @@ function reshardNode(nodeFrom, nodeTo, next) {
     const st1 = Date.now();
     reshard.reshard(nodeTo, nodeFrom, (err, result) => {
         if (err) return next(err);
-        console.log(`${result}\n`);
+        console.log(`${result}`);
         printTime(Date.now() - st1);
         next(null);
     });
@@ -94,7 +100,7 @@ function removeNode(host, port, next) {
     const st1 = Date.now();
     removeMaster.removeMaster(host, port, (err, result) => {
         if (err) return next(err);
-        console.log(`${result}\n`);
+        console.log(`${result}`);
         printTime(Date.now() - st1);
         next(null);
     });
@@ -105,7 +111,7 @@ function addMasterNode(nodeTo, node, next) {
     const st1 = Date.now();
     addNode.addMaster(nodeTo, node, (err, result) => {
         if (err) return next(err);
-        console.log(`${result}\n`);
+        console.log(`${result}`);
         printTime(Date.now() - st1);
         next(null);
     });
@@ -120,11 +126,10 @@ function addKeys(keys, next) {
         let node = nodes[nodeList[i]];
         clusterNodes.push({ host: node.private_ip, port: node.port });
     }
-    console.log(clusterNodes);
     // build unique keys from `${starttime}:${counter}`
     writeKeys.writeKeys(clusterNodes, keys, startTime, (err, result) => {
         if (err) return next(err);
-        console.log(`${result}\n`);
+        console.log(`${result}`);
         printTime(Date.now() - st1);
         count(next);
     });
@@ -227,7 +232,8 @@ async.series([
         next(null)
     },
     next => async.eachOfSeries(inputs.changes, (change, key, next) => {
-        console.log(`\n******* ${change.type}, ${change.value} *******\n`)
+        console.log('------------------------------------------------------------------');
+        console.log(`\n******* ${change.type}, ${change.value} *******\n`);
         switch (change.type) {
             case 'init': {
                 if (latest < 3) return createClusterofThreeNodes(next);

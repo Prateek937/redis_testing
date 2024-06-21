@@ -14,6 +14,6 @@ module.exports.removeMaster = (node, port, next) => {
     ],  (err, result) => {
         if(err) return next(err);
         // next(null, `removed successfully!`);
-        next(null, next);
+        next(null, result.split('>>> ').join('').trim('\n'));
     });
 }
