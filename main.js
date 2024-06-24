@@ -64,8 +64,9 @@ function createClusterofThreeNodes(next) {
             console.log(`${result}`);
             console.log("### FLUSHING DATABASE ###\n");
             printTime(Date.now() - startTime);
-            flushdb.flushall(clusterNodes, next);
         }),
+        next => flushdb.flushall(clusterNodes, next),
+        next => count(next),
         next => {
             latest = 3;
             file.writeFile('./latest.json', JSON.stringify({ latest: 3 }, null, 2), next)

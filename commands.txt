@@ -1,56 +1,67 @@
-redis-cli --cluster create 172.31.5.232:6379 172.31.5.215:6379 172.31.5.81:6379 --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.232 -p 6379 flushall
-redis-cli -h 172.31.5.215 -p 6379 flushall
-redis-cli -h 172.31.5.81 -p 6379 flushall
-redis-cli --cluster add-node 172.31.5.72:6379 172.31.5.197:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.72:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.232 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli --cluster reshard 172.31.5.72:6379 --cluster-from 7524a9357fa3c4f262077581c7727338acfb5e7a --cluster-to 51b5089eb9e8ef2e636f68c3fc6090aa1ac81ce6 --cluster-slots 4096 --cluster-yes | grep Ready
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER MYID
-redis-cli --cluster del-node 172.31.5.72:6379 7524a9357fa3c4f262077581c7727338acfb5e7a
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.81:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster add-node 172.31.5.72:6379 172.31.5.197:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.72:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.232 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli --cluster reshard 172.31.5.72:6379 --cluster-from 7524a9357fa3c4f262077581c7727338acfb5e7a --cluster-to 51b5089eb9e8ef2e636f68c3fc6090aa1ac81ce6 --cluster-slots 4096 --cluster-yes | grep Ready
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER MYID
-redis-cli --cluster del-node 172.31.5.72:6379 7524a9357fa3c4f262077581c7727338acfb5e7a
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.81:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster add-node 172.31.5.72:6379 172.31.5.197:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.72:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.232 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli --cluster reshard 172.31.5.72:6379 --cluster-from 7524a9357fa3c4f262077581c7727338acfb5e7a --cluster-to 51b5089eb9e8ef2e636f68c3fc6090aa1ac81ce6 --cluster-slots 4096 --cluster-yes | grep Ready
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER MYID
-redis-cli --cluster del-node 172.31.5.72:6379 7524a9357fa3c4f262077581c7727338acfb5e7a
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.81:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster add-node 172.31.5.72:6379 172.31.5.197:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.72:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.232 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
-redis-cli --cluster reshard 172.31.5.72:6379 --cluster-from 7524a9357fa3c4f262077581c7727338acfb5e7a --cluster-to 51b5089eb9e8ef2e636f68c3fc6090aa1ac81ce6 --cluster-slots 4096 --cluster-yes | grep Ready
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli -h 172.31.5.72 -p 6379 CLUSTER MYID
-redis-cli --cluster del-node 172.31.5.72:6379 7524a9357fa3c4f262077581c7727338acfb5e7a
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
-redis-cli --cluster rebalance 172.31.5.81:6379 --cluster-use-empty-masters
-redis-cli --cluster check 172.31.5.197:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+redis-cli --cluster create 172.31.5.253:6379 172.31.5.210:6379 172.31.5.59:6379 --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+redis-cli -h 172.31.5.253 -p 6379 flushall
+redis-cli -h 172.31.5.210 -p 6379 flushall
+redis-cli -h 172.31.5.59 -p 6379 flushall
+
+redis-cli --cluster add-node 172.31.5.29:6379 172.31.5.253:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster rebalance 172.31.5.29:6379 --cluster-use-empty-masters
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.253 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli -h 172.31.5.29 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli --cluster reshard 172.31.5.29:6379 --cluster-from 159204abd0942e68a5602a74210f50902e6398d3 --cluster-to 6223f91fb72236190b3b0ac4f0bc841940031d67 --cluster-slots 4096 --cluster-yes | grep Ready
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.29 -p 6379 CLUSTER MYID
+redis-cli --cluster del-node 172.31.5.29:6379 159204abd0942e68a5602a74210f50902e6398d3
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster rebalance 172.31.5.59:6379 --cluster-use-empty-masters
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster add-node 172.31.5.29:6379 172.31.5.253:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster rebalance 172.31.5.29:6379 --cluster-use-empty-masters
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.253 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli -h 172.31.5.29 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli --cluster reshard 172.31.5.29:6379 --cluster-from 159204abd0942e68a5602a74210f50902e6398d3 --cluster-to 6223f91fb72236190b3b0ac4f0bc841940031d67 --cluster-slots 4096 --cluster-yes | grep Ready
+
+------------------------------------------------------------------------------------------
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.253 -p 6379 flushall
+redis-cli -h 172.31.5.210 -p 6379 flushall
+redis-cli -h 172.31.5.59 -p 6379 flushall
+
+redis-cli --cluster add-node 172.31.5.132:6379 172.31.5.253:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster rebalance 172.31.5.132:6379 --cluster-use-empty-masters
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.253 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli -h 172.31.5.132 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli --cluster reshard 172.31.5.132:6379 --cluster-from f86893e1a1b0d8f4f996be306ea2e7c908af03bd --cluster-to 6223f91fb72236190b3b0ac4f0bc841940031d67 --cluster-slots 4096 --cluster-yes | grep Ready
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.132 -p 6379 CLUSTER MYID
+redis-cli --cluster del-node 172.31.5.132:6379 f86893e1a1b0d8f4f996be306ea2e7c908af03bd
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster rebalance 172.31.5.59:6379 --cluster-use-empty-masters
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster add-node 172.31.5.132:6379 172.31.5.253:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli --cluster rebalance 172.31.5.132:6379 --cluster-use-empty-masters
+redis-cli --cluster check 172.31.5.253:6379 | grep keys | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+
+redis-cli -h 172.31.5.253 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli -h 172.31.5.132 -p 6379 CLUSTER NODES | grep myself | cut -d" " -f1
+redis-cli --cluster reshard 172.31.5.132:6379 --cluster-from f86893e1a1b0d8f4f996be306ea2e7c908af03bd --cluster-to 6223f91fb72236190b3b0ac4f0bc841940031d67 --cluster-slots 4096 --cluster-yes | grep Ready
