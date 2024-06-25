@@ -1,9 +1,10 @@
 - hosts: all
   gather_facts: no
   vars:
-  - redis_url: "https://github.com/redis/redis/archive/refs/tags/7.2.4.tar.gz"
-  - rediszip_path: "/home/ubuntu/redis-stable.tar.gz"
-  - redis_path: "/home/ubuntu/redis-7.2.4"
+  # - redis_url: "https://github.com/redis/redis/archive/refs/tags/7.2.4.tar.gz"
+  - redis_url: "https://download.redis.io/redis-stable.tar.gz?_gl=1*10q0rgc*_gcl_au*MjgwMzMwNzg4LjE3MTg5NjcyNDI."
+  - rediszip_path: "/home/ubuntu/redis_stable.tar.gz"
+  - redis_path: "/home/ubuntu/redis_stable"
   - home: "/home/ubuntu"
   - change_lines:
     - key: "# cluster-enabled yes"

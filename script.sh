@@ -5,45 +5,70 @@ latest=$(cat ./latest.json | jq ."latest")
 
 nodes=($(echo "$inventory" | jq -c '.[]')) #convert the object to array
 
+node1=$(echo "${nodes[0]}" | jq -r '.private_ip')
+node2=$(echo "${nodes[1]}" | jq -r '.private_ip')
+node3=$(echo "${nodes[2]}" | jq -r '.private_ip')
+node4=$(echo "${nodes[3]}" | jq -r '.private_ip')
+port1=6379
+port2=6379
+port3=6379
+port4=6379
+
 # function to count the keys and nodes
 check() {
-    redis-cli --cluster check $(echo "${nodes[0]}" | jq -r '.private_ip + ":" + (.port|tostring)') | grep keys
+    echo -e "\n-----------------------------------------\n"
+    redis-cli --cluster check $node1:$port1 | grep keys
+    echo -e "\n-----------------------------------------\n"
 } 
 
-# checking after every step
-check 
+createClusterOfThreeNodes() {
+    # checking after every step
+    check 
 
-# create cluster of three nodes
-clusterNodes=($(echo "${nodes[0]}" | jq -r '.private_ip + ":" + (.port|tostring)')  $(echo "${nodes[0]}" | jq -r '.private_ip + ":" + (.port|tostring)') $(echo "${nodes[0]}" | jq -r '.private_ip + ":" + (.port|tostring)'))
-redis-cli --cluster create  ${clusterNodes[@]} --cluster-replicas 0 --cluster-yes | grep OK
+    # create cluster of three nodes
+    echo -e "CREATING CLUSTER\n"
+    redis-cli --cluster create  $node1:$port1 $node2:$port2 $node3:$port3 --cluster-replicas 0 --cluster-yes | grep OK
+    sleep 4
+    check 
 
-# flush cluster
-redis-cli -h $(echo "${nodes[0]}" | jq -r '.private_ip') -p 6379 flushall
-redis-cli -h $(echo "${nodes[1]}" | jq -r '.private_ip') -p 6379 flushall
-redis-cli -h $(echo "${nodes[2]}" | jq -r '.private_ip') -p 6379 flushall
+}
 
-# add 4th node to the cluster
-nodeToAdd=$(echo "${nodes[3]}" | jq -r '.private_ip + ":" + (.port|tostring)')
-existingNode=$(echo "${nodes[0]}" | jq -r '.private_ip + ":" + (.port|tostring)')
-redis-cli --cluster add-node $nodeToAdd $existingNode 
-check
+addFourthNode() {
+    # add 4th node to the cluster
+    echo -e "ADDING 4TH NODE\n"
+    redis-cli --cluster add-node $node4:$port4 $node1:$port1 
+    sleep 4
+    check
 
-# rebalance cluster
-redis-cli --cluster rebalance $nodeToAdd --cluster-use-empty-masters
-check
+    # rebalance cluster
+    echo -e "REBALACING\n"
+    redis-cli --cluster rebalance $node4:$port4 --cluster-use-empty-masters | grep Rebalancing
+    sleep 4
+    check
+}
 
-# reshard 4th node to first node
-nodeFromId=$(redis-cli -h $(echo "${nodes[3]}" | jq -r '.private_ip') -p 6379 CLUSTER MYID)
-nodeToId=$(redis-cli -h $(echo "${nodes[0]}" | jq -r '.private_ip') -p 6379 CLUSTER MYID)
-nodeFrom=$(echo "${nodes[3]}" | jq -r '.private_ip + ":" + (.port|tostring)')
-redis-cli --cluster reshard  $nodeFrom --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 4096 --cluster-yes | grep Ready
-check
+removeFourthNode() {
+    # reshard 4th node to first node
+    nodeFromId=$(redis-cli -h $node4 -p $port4 CLUSTER MYID)
+    nodeToId=$(redis-cli -h $node1 -p $port1 CLUSTER MYID)
+    echo -e "RESHARDING FROM ${nodeFrom} \n"
+    redis-cli --cluster reshard  $node4:$port4 --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 4096 --cluster-yes | grep Ready
+    check
 
-# delete 4th node from the cluster
-redis-cli -h $(echo "${nodes[3]}" | jq -r '.private_ip') -p 6379 CLUSTER MYID
-redis-cli --cluster del-node $(echo "${nodes[3]}" | jq -r '.private_ip') $nodeFromId
-check
+    # delete 4th node from the cluster
+    echo -e "REMOVING 4TH NODE\n"
+    redis-cli --cluster del-node $node4:$port4 $nodeFromId 
+    check
 
-#rebalance again
-redis-cli --cluster rebalance $(echo "${nodes[0]}" | jq -r '.private_ip + ":" + (.port|tostring)') --cluster-use-empty-masters
-check
+    #rebalance again
+    echo -e "REBALANCING\n"
+    redis-cli --cluster rebalance $node1:$port1 --cluster-use-empty-masters | grep Rebalancing
+    check
+}
+
+createClusterOfThreeNodes
+addFourthNode
+removeFourthNode
+addFourthNode
+removeFourthNode
+
