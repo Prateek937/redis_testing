@@ -18,3 +18,7 @@ ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu 
 ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
 ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
 ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
+ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
+ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
+ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
+ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
