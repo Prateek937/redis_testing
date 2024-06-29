@@ -1,0 +1,204 @@
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 1 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+CREATING CLUSTER
+
+[OK] All nodes agree about slots configuration.
+[OK] All 16384 slots covered.
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+ADDING 4TH NODE
+
+>>> Adding node 172.31.5.207:6379 to cluster 172.31.5.50:6379
+>>> Performing Cluster Check (using node 172.31.5.50:6379)
+M: 2c674e1feeb2949c8bedea8bc0ed904fe0102c5b 172.31.5.50:6379
+   slots:[0-5460] (5461 slots) master
+M: 6ce8bf19aef1c7c934b05955f65f0f3ae1a86473 172.31.5.174:6379
+   slots:[5461-10922] (5462 slots) master
+M: 631576b42e2d0f9c1d4a29372ca5d88bcd4a170b 172.31.5.18:6379
+   slots:[10923-16383] (5461 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 172.31.5.207:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 172.31.5.207:6379
+>>> Send CLUSTER MEET to node 172.31.5.207:6379 to make it join the cluster.
+[OK] New node added correctly.
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.207:6379 (6130900c...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALACING
+
+>>> Rebalancing across 4 nodes. Total weight = 4.00
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.207:6379 (6130900c...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+RESHARDING FROM  
+
+Ready to move 4096 slots.
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 8192 slots | 1 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REMOVING 4TH NODE
+
+>>> Removing node 6130900c34ed6ed3c0a38a14882d0bdf2404cc00 from cluster 172.31.5.207:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> Sending CLUSTER RESET SOFT to the deleted node.
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 8192 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALANCING
+
+>>> Rebalancing across 3 nodes. Total weight = 3.00
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+ADDING 4TH NODE
+
+>>> Adding node 172.31.5.207:6379 to cluster 172.31.5.50:6379
+>>> Performing Cluster Check (using node 172.31.5.50:6379)
+M: 2c674e1feeb2949c8bedea8bc0ed904fe0102c5b 172.31.5.50:6379
+   slots:[2731-6826],[10923-12287] (5461 slots) master
+M: 6ce8bf19aef1c7c934b05955f65f0f3ae1a86473 172.31.5.174:6379
+   slots:[0-1365],[6827-10922] (5462 slots) master
+M: 631576b42e2d0f9c1d4a29372ca5d88bcd4a170b 172.31.5.18:6379
+   slots:[1366-2730],[12288-16383] (5461 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 172.31.5.207:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 172.31.5.207:6379
+>>> Send CLUSTER MEET to node 172.31.5.207:6379 to make it join the cluster.
+[OK] New node added correctly.
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.207:6379 (6130900c...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALACING
+
+>>> Rebalancing across 4 nodes. Total weight = 4.00
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.207:6379 (6130900c...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+RESHARDING FROM  
+
+*** Please fix your cluster problems before resharding
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.207:6379 (6130900c...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REMOVING 4TH NODE
+
+>>> Removing node 6130900c34ed6ed3c0a38a14882d0bdf2404cc00 from cluster 172.31.5.207:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+Node 172.31.5.174:6379 replied with error:
+ERR Unknown node 6130900c34ed6ed3c0a38a14882d0bdf2404cc00
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALANCING
+
+
+-----------------------------------------
+
+172.31.5.50:6379 (2c674e1f...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.174:6379 (6ce8bf19...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.18:6379 (631576b4...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------

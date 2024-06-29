@@ -53,6 +53,7 @@
     package:
       name:
       - tar
+      - jq
       - gcc
       - make
       - net-tools
