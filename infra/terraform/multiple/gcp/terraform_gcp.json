@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "jungle-deploy",
+  "private_key_id": "080787c37f9bb5662c88dec6ffb7d8bffaeec162",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDaS9d/km+Qei3j\nL28wFjupmITdYBH//2kD/QP+Vz/vgwAmATLYVg8Jh804UcxyQx2hnuGKiVMULi/l\nHEVNNENoMuoAXVyrBlEak6PDSuQI/Mnd+lpTARA5fPrVi++pXAuO6Tlwi6jy7Nck\ndRnvAHbY3/SykErOgzDd+9nUGYGJAb+URdFg2kK1rsGT3reD3NYD7tZTsdTjVuu6\naAagWVy86ZGuyWUjBDIaDO8Zr8KgbhIsbZf0i7pyMOTnqB3qu0tTL7HTCCCgy83Q\n38wqoZP6SQXn5FdlOTKCxiTcdJPx2j4qBrQ2ZP7l40ko0cTzZMTM6VIPSJROhnc3\nYK4P1KN5AgMBAAECgf9JJZ1vdAFKHMd+ndlE5Iozr9C7VrqxWM1KhY4V8LburvoY\n1bcCpe3nRuweFzCBnGtOIpZjquHz/rP6If78lEHAakiIr12i0GQUp9PFNxS1hTpG\nuyOcwFi5RqEvdyDa0GLAVciXdFw/ZkSj9gjRk8+uu3bqkybm8ed+bZpe8WgXNIec\nCLRv7Zp+CHDl9aAg21gzJdaNDNcnPNO7qDe9IzqBqE1diYg2+3C/uoVshp3NeExW\nYqF1MUqm0QK+NS5Gu1g1DwFdLtvJMRD28blLS0qhIWTGY7gigyUAaDKqPXagXeLe\nxhYdYupwCbRrUtU8/GNMcwPZnfq0XaEvAsfeIgECgYEA9cslJI2SRmc6+/hCcGCD\nrZLdbAPCZPNgEqtxLO05UMyZVIiu0iZ0TOaE8fDSCO6X0iqmRjavR0lCW4BTPViI\nnumtiogY7LQ/ZB1a4IcH3J/+4DOYe52OGDs75pdzGRqPt3yM9Kx6rVh24MtkE0f+\nb+TzIq/ECnVnIe3cNOI2TfkCgYEA41xkkT+8LPF0d+BuhiiavZpV5yy5larJQwz7\n0XCjuKzRcOxtXpVBOl4lbXUrgMcerp5dxw6e3yLyYCxBjb8vZ6/j7Leumw1DqXlV\nB7MUqLKZDDzEgra3eAOghw4sI7zmqsbmf7VsC3Lut+IRsMIX0+KEa1BRDUTd58qv\nn2FMYYECgYBdspYzLADB8+JJYWc6XaB0z5K29Wvqfdh25YIcRUZfJc+hqQUzuVMG\naa3uaQY4P3QCux1tkLUasLOqG+4faZuTMLNmJuGRgljT+ljFVNRLZ3aK00Bihzo+\nxH3eNoe63yRAJyu4rfOKFzoiEYbRztUQpK+G3ogWEJFDHuCeDEn1SQKBgQCT4pD3\neUFo6lUbdDvvv5GHKlAd4hWEqGXo2xUgkeesQ5ynmuE42FRpJrupisEVLm9inVfa\nFkR4Vz7YF3E8RdML2niijIdiCyqrnWQVcgJKCIFMWGppq3eC9LkBn9JOHJzdECr1\nfogcmlF0AfQHyPe+tmPzeXZ+7wB3uHqrbJpGAQKBgQDNHlbBU4vvxZOAf+TJ9CU6\nzvIRJKJEYpO9xmb6WHQWDiW9cKaYfoB/tINezRHO9CUm73teMSmaMMq4KIb9ZzG6\nJ1VesVj+IK8vj5Kz/mQJW3t1rRCu4RGP+zMXIHQXd31gCBsxNSc9NHK3kPKhYJmZ\nPWnQBt9+rStc0fCQfJ/OtA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "gcp-deploy@jungle-deploy.iam.gserviceaccount.com",
+  "client_id": "100318540038072051552",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gcp-deploy%40jungle-deploy.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
