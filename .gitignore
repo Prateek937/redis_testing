@@ -56,3 +56,4 @@ Thumbs.db
 infra/terraform/multiple/inventory.json
 infra/terraform/multiple/inventory_raw.json
 
+infra/terraform/multiple/gcp/terraform_gcp.json
