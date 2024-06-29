@@ -2,5 +2,8 @@
 
 
 read -p "max: " max
-terraform apply -var max=$max -auto-approve
-node configure.js
+read -p "cloud: " cloud
+terraform -chdir=./$cloud apply -var max=$max -auto-approve
+command="node configure.js $cloud"
+echo $command
+$command

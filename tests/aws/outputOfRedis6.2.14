@@ -1,0 +1,201 @@
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 1 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+CREATING CLUSTER
+
+[OK] All nodes agree about slots configuration.
+[OK] All 16384 slots covered.
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5462 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+ADDING 4TH NODE
+
+>>> Adding node 172.31.5.82:6379 to cluster 172.31.5.89:6379
+>>> Performing Cluster Check (using node 172.31.5.89:6379)
+M: bfab2f0ecb27bc367869890845be0dc11b3d4ea3 172.31.5.89:6379
+   slots:[0-5460] (5461 slots) master
+M: ce3a5fec77646d2c604f1843fc104e0eb66db21d 172.31.5.42:6379
+   slots:[10923-16383] (5461 slots) master
+M: aba0bcd1abea98f219f0921d4a0147179b5bf15d 172.31.5.50:6379
+   slots:[5461-10922] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Send CLUSTER MEET to node 172.31.5.82:6379 to make it join the cluster.
+[OK] New node added correctly.
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALACING
+
+>>> Rebalancing across 4 nodes. Total weight = 4.00
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+RESHARDING FROM  
+
+Ready to move 4096 slots.
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 8192 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REMOVING 4TH NODE
+
+>>> Removing node 206353053d96c542489977e4e429f052c747b268 from cluster 172.31.5.82:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> Sending CLUSTER RESET SOFT to the deleted node.
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 8192 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 4096 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALANCING
+
+>>> Rebalancing across 3 nodes. Total weight = 3.00
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+ADDING 4TH NODE
+
+>>> Adding node 172.31.5.82:6379 to cluster 172.31.5.89:6379
+>>> Performing Cluster Check (using node 172.31.5.89:6379)
+M: bfab2f0ecb27bc367869890845be0dc11b3d4ea3 172.31.5.89:6379
+   slots:[2731-6826],[10923-12287] (5461 slots) master
+M: ce3a5fec77646d2c604f1843fc104e0eb66db21d 172.31.5.42:6379
+   slots:[0-1365],[12288-16383] (5462 slots) master
+M: aba0bcd1abea98f219f0921d4a0147179b5bf15d 172.31.5.50:6379
+   slots:[1366-2730],[6827-10922] (5461 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Send CLUSTER MEET to node 172.31.5.82:6379 to make it join the cluster.
+[OK] New node added correctly.
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALACING
+
+>>> Rebalancing across 4 nodes. Total weight = 4.00
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+RESHARDING FROM  
+
+*** Please fix your cluster problems before resharding
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REMOVING 4TH NODE
+
+>>> Removing node 206353053d96c542489977e4e429f052c747b268 from cluster 172.31.5.82:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+Node 172.31.5.42:6379 replied with error:
+ERR Unknown node 206353053d96c542489977e4e429f052c747b268
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALANCING
+
+
+-----------------------------------------
+
+172.31.5.89:6379 (bfab2f0e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.42:6379 (ce3a5fec...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.50:6379 (aba0bcd1...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.82:6379 (20635305...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
