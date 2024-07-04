@@ -69,6 +69,7 @@ removeFourthNode() {
 createClusterOfThreeNodes
 addFourthNode
 removeFourthNode
+sleep 60
 addFourthNode
 removeFourthNode
 

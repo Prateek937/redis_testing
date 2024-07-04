@@ -1,0 +1,282 @@
+--------------------------------------------
+redis-cli --cluster check 172.31.5.62:6379
+
+172.31.5.62:6379 (bdc42bd4...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 1 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+M: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots: (0 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[ERR] Not all 16384 slots are covered by nodes.
+
+--------------------------------------------
+redis-cli --cluster create  172.31.5.62:6379 172.31.5.12:6379 172.31.5.210:6379 --cluster-replicas 0 --cluster-yes | grep OK
+
+[OK] All nodes agree about slots configuration.
+[OK] All 16384 slots covered.
+--------------------------------------------
+redis-cli --cluster add-node 172.31.5.30:6379 172.31.5.62:6379
+
+>>> Adding node 172.31.5.30:6379 to cluster 172.31.5.62:6379
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+M: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots:[0-5460] (5461 slots) master
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[10923-16383] (5461 slots) master
+M: a7e37bcbf201c058f1d2be75366d092921e14feb 172.31.5.12:6379
+   slots:[5461-10922] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 172.31.5.30:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 172.31.5.30:6379
+>>> Send CLUSTER MEET to node 172.31.5.30:6379 to make it join the cluster.
+[OK] New node added correctly.
+--------------------------------------------
+redis-cli --cluster add-node 172.31.5.6:6379 172.31.5.62:6379
+
+>>> Adding node 172.31.5.6:6379 to cluster 172.31.5.62:6379
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+M: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots:[0-5460] (5461 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots: (0 slots) master
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[10923-16383] (5461 slots) master
+M: a7e37bcbf201c058f1d2be75366d092921e14feb 172.31.5.12:6379
+   slots:[5461-10922] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 172.31.5.6:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 172.31.5.6:6379
+>>> Send CLUSTER MEET to node 172.31.5.6:6379 to make it join the cluster.
+[OK] New node added correctly.
+--------------------------------------------
+redis-cli -h 172.31.5.62 -p 6379 cluster info | grep cluster_size
+
+cluster_size:3
+--------------------------------------------
+redis-cli --cluster check 172.31.5.62:6379
+
+172.31.5.62:6379 (bdc42bd4...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.30:6379 (760d1c6e...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.6:6379 (31ff33f2...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.210:6379 (81f73991...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.12:6379 (a7e37bcb...) -> 0 keys | 5462 slots | 0 slaves.
+[OK] 0 keys in 5 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+M: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots:[0-5460] (5461 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots: (0 slots) master
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots: (0 slots) master
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[10923-16383] (5461 slots) master
+M: a7e37bcbf201c058f1d2be75366d092921e14feb 172.31.5.12:6379
+   slots:[5461-10922] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+--------------------------------------------
+redis-cli --cluster rebalance 172.31.5.6:6379 | grep Rebalancing
+
+[ERR] Invalid arguments: you need to pass either a valid address (ie. 120.0.0.1:7000) or space separated IP and port (ie. 120.0.0.1 7000)
+--------------------------------------------
+redis-cli --cluster rebalance 172.31.5.6:6379 --cluster-use-empty-masters | grep Rebalancing
+
+>>> Rebalancing across 5 nodes. Total weight = 5.00
+--------------------------------------------
+redis-cli --cluster check 172.31.5.62:6379
+
+172.31.5.62:6379 (bdc42bd4...) -> 0 keys | 3276 slots | 0 slaves.
+172.31.5.30:6379 (760d1c6e...) -> 0 keys | 3278 slots | 0 slaves.
+172.31.5.6:6379 (31ff33f2...) -> 0 keys | 3278 slots | 0 slaves.
+172.31.5.210:6379 (81f73991...) -> 0 keys | 3276 slots | 0 slaves.
+172.31.5.12:6379 (a7e37bcb...) -> 0 keys | 3276 slots | 0 slaves.
+[OK] 0 keys in 5 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+M: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots:[2185-5460] (3276 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[1092-2184],[10923-13107] (3278 slots) master
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-1091],[5461-7646] (3278 slots) master
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[13108-16383] (3276 slots) master
+M: a7e37bcbf201c058f1d2be75366d092921e14feb 172.31.5.12:6379
+   slots:[7647-10922] (3276 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+--------------------------------------------
+redis-cli --cluster reshard  172.31.5.62:6379 --cluster-from bdc42bd4a3fd0863334a546d4d31b84ccdac9083 --cluster-to 81f73991f1a22627c79625ca6963152bdde67b44 --cluster-slots 3276  --cluster-yes | grep Ready
+
+Ready to move 3276 slots.
+--------------------------------------------
+redis-cli --cluster reshard  172.31.5.12:6379 --cluster-from a7e37bcbf201c058f1d2be75366d092921e14feb --cluster-to 760d1c6eb694d0b89d1c3e852f21663350d86b27 --cluster-slots 3276  --cluster-yes | grep Ready
+
+Ready to move 3276 slots.
+--------------------------------------------
+redis-cli --cluster reshard  172.31.5.12:6379 --cluster-from a7e37bcbf201c058f1d2be75366d092921e14feb --cluster-to 760d1c6eb694d0b89d1c3e852f21663350d86b27 --cluster-slots 3276  --cluster-yes | grep Ready
+
+>>> Performing Cluster Check (using node 172.31.5.12:6379)
+S: a7e37bcbf201c058f1d2be75366d092921e14feb 172.31.5.12:6379
+   slots: (0 slots) slave
+   replicates 760d1c6eb694d0b89d1c3e852f21663350d86b27
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[2185-5460],[13108-16383] (6552 slots) master
+   1 additional replica(s)
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[1092-2184],[7647-13107] (6554 slots) master
+   1 additional replica(s)
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-1091],[5461-7646] (3278 slots) master
+S: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots: (0 slots) slave
+   replicates 81f73991f1a22627c79625ca6963152bdde67b44
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+*** The specified node (a7e37bcbf201c058f1d2be75366d092921e14feb) is not known or not a master, please retry.
+--------------------------------------------
+redis-cli --cluster rebalance 172.31.5.6:6379 | grep Rebalancing
+
+>>> Rebalancing across 3 nodes. Total weight = 3.00
+--------------------------------------------
+redis-cli --cluster check 172.31.5.62:6379
+
+172.31.5.30:6379 (760d1c6e...) -> 0 keys | 5461 slots | 1 slaves.
+172.31.5.6:6379 (31ff33f2...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.210:6379 (81f73991...) -> 0 keys | 5461 slots | 1 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+S: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots: (0 slots) slave
+   replicates 81f73991f1a22627c79625ca6963152bdde67b44
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[7647-13107] (5461 slots) master
+   1 additional replica(s)
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-3275],[5461-7646] (5462 slots) master
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[3276-5460],[13108-16383] (5461 slots) master
+   1 additional replica(s)
+S: a7e37bcbf201c058f1d2be75366d092921e14feb 172.31.5.12:6379
+   slots: (0 slots) slave
+   replicates 760d1c6eb694d0b89d1c3e852f21663350d86b27
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+--------------------------------------------
+redis-cli --cluster del-node 172.31.5.62:6379 bdc42bd4a3fd0863334a546d4d31b84ccdac9083
+
+>>> Removing node bdc42bd4a3fd0863334a546d4d31b84ccdac9083 from cluster 172.31.5.62:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> Sending CLUSTER RESET SOFT to the deleted node.
+--------------------------------------------
+redis-cli --cluster del-node 172.31.5.12:6379 a7e37bcbf201c058f1d2be75366d092921e14feb
+
+>>> Removing node a7e37bcbf201c058f1d2be75366d092921e14feb from cluster 172.31.5.12:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> Sending CLUSTER RESET SOFT to the deleted node.
+--------------------------------------------
+redis-cli --cluster check 172.31.5.210:6379
+
+172.31.5.210:6379 (81f73991...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.30:6379 (760d1c6e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.6:6379 (31ff33f2...) -> 0 keys | 5462 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 172.31.5.210:6379)
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[3276-5460],[13108-16383] (5461 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[7647-13107] (5461 slots) master
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-3275],[5461-7646] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+--------------------------------------------
+redis-cli --cluster add-node 172.31.5.62:6379 172.31.5.210:6379
+
+>>> Adding node 172.31.5.62:6379 to cluster 172.31.5.210:6379
+>>> Performing Cluster Check (using node 172.31.5.210:6379)
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[3276-5460],[13108-16383] (5461 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[7647-13107] (5461 slots) master
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-3275],[5461-7646] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 172.31.5.62:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 172.31.5.62:6379
+>>> Send CLUSTER MEET to node 172.31.5.62:6379 to make it join the cluster.
+[OK] New node added correctly.
+--------------------------------------------
+redis-cli --cluster add-node 172.31.5.12:6379 172.31.5.210:6379
+
+>>> Adding node 172.31.5.12:6379 to cluster 172.31.5.210:6379
+>>> Performing Cluster Check (using node 172.31.5.210:6379)
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[3276-5460],[13108-16383] (5461 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[7647-13107] (5461 slots) master
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-3275],[5461-7646] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 172.31.5.12:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 172.31.5.12:6379
+>>> Send CLUSTER MEET to node 172.31.5.12:6379 to make it join the cluster.
+[OK] New node added correctly.
+--------------------------------------------
+redis-cli -h 172.31.5.62 -p 6379 cluster info | grep cluster_size
+
+cluster_size:3
+--------------------------------------------
+redis-cli --cluster check 172.31.5.62:6379
+
+172.31.5.62:6379 (bdc42bd4...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.30:6379 (760d1c6e...) -> 0 keys | 5461 slots | 0 slaves.
+172.31.5.6:6379 (31ff33f2...) -> 0 keys | 5462 slots | 0 slaves.
+172.31.5.210:6379 (81f73991...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+>>> Performing Cluster Check (using node 172.31.5.62:6379)
+M: bdc42bd4a3fd0863334a546d4d31b84ccdac9083 172.31.5.62:6379
+   slots: (0 slots) master
+M: 760d1c6eb694d0b89d1c3e852f21663350d86b27 172.31.5.30:6379
+   slots:[7647-13107] (5461 slots) master
+M: 31ff33f2c7df33487da89a152e4941f0fa1fe0ce 172.31.5.6:6379
+   slots:[0-3275],[5461-7646] (5462 slots) master
+M: 81f73991f1a22627c79625ca6963152bdde67b44 172.31.5.210:6379
+   slots:[3276-5460],[13108-16383] (5461 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.

@@ -20,11 +20,15 @@ command="redis-cli --cluster check $node1:6379"
 echo -e "--------------------------------------------\n$command\n"
 $command
 
-command="redis-cli --cluster create  $node1:$port1 $node2:$port2 $node3:$port3 --cluster-replicas 0 --cluster-yes | grep OK"
+command="redis-cli --cluster create  $node1:6379 $node2:6379 $node3:6379 --cluster-replicas 0 --cluster-yes | grep OK"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster create  $node1:6379 $node2:6379 $node3:6379 --cluster-replicas 0 --cluster-yes | grep OK
 
 sleep 4
+
+command="redis-cli --cluster check $node1:6379" 
+echo -e "--------------------------------------------\n$command\n"
+$command
 
 command="redis-cli --cluster add-node $node4:6379 $node1:6379"
 echo -e "--------------------------------------------\n$command\n"
@@ -38,25 +42,21 @@ $command
 
 sleep 2
 
-command="redis-cli --cluster check $node1:6379"
+command="redis-cli -h $node1 -p 6379 cluster info | grep cluster_size"
 echo -e "--------------------------------------------\n$command\n"
-$command
-
-command="redis-cli cluster info | grep cluster_size"
-echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli -h $node1 -p 6379 cluster info | grep cluster_size
 
 command="redis-cli --cluster check $node1:6379"
 echo -e "--------------------------------------------\n$command\n"
 $command
 
-command="redis-cli --cluster rebalance $node5:6379"
+command="redis-cli --cluster rebalance $node5 6379 | grep Rebalancing"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster rebalance $node5:6379 | grep Rebalancing
 
-command="redis-cli --cluster rebalance $node5:6379 --cluster-use-empty-masters"
+command="redis-cli --cluster rebalance $node5:6379 --cluster-use-empty-masters | grep Rebalancing"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster rebalance $node5:6379 --cluster-use-empty-masters | grep Rebalancing
 
 sleep 4
 
@@ -68,25 +68,23 @@ nodeFromId=$(redis-cli -h $node1 -p 6379 CLUSTER MYID)
 nodeToId=$(redis-cli -h $node3 -p 6379 CLUSTER MYID)
 command="redis-cli --cluster reshard  $node1:6379 --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 3276  --cluster-yes | grep Ready"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster reshard  $node1:6379 --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 3276  --cluster-yes | grep Ready
 
 sleep 4
 
 nodeFromId=$(redis-cli -h $node2 -p 6379 CLUSTER MYID)
 nodeToId=$(redis-cli -h $node4 -p 6379 CLUSTER MYID)
-command="redis-cli --cluster reshard  $node2:$port4 --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 3276  --cluster-yes | grep Ready"
+command="redis-cli --cluster reshard  $node2:6379 --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 3276  --cluster-yes | grep Ready"
 echo -e "--------------------------------------------\n$command\n"
-$command
-
-sleep 4
+redis-cli --cluster reshard  $node2:6379 --cluster-from $nodeFromId --cluster-to $nodeToId --cluster-slots 3276  --cluster-yes | grep Ready
 
 commnad="redis-cli --cluster check $node1:6379"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster check $node1:6379
 
-command="redis-cli --cluster rebalance $node5:6379"
+command="redis-cli --cluster rebalance $node5:6379 | grep Rebalancing"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster rebalance $node5:6379 | grep Rebalancing
 
 sleep 4
 
@@ -113,6 +111,8 @@ echo -e "--------------------------------------------\n$command\n"
 $command
 
 #---------------------
+echo "waiting 60 seconds ..."
+sleep 60
 
 command="redis-cli --cluster add-node $node1:6379 $node3:6379"
 echo -e "--------------------------------------------\n$command\n"
@@ -126,14 +126,22 @@ $command
 
 sleep 2
 
-command="redis-cli --cluster check $node1:6379"
+command="redis-cli -h $node3 -p 6379 cluster info | grep cluster_size"
+echo -e "--------------------------------------------\n$command\n"
+redis-cli -h $node3 -p 6379 cluster info | grep cluster_size
+
+command="redis-cli --cluster check $node3:6379"
 echo -e "--------------------------------------------\n$command\n"
 $command
 
-command="redis-cli cluster info | grep cluster_size"
+command="redis-cli --cluster rebalance $node1:6379 --cluster-use-empty-masters | grep Rebalancing"
 echo -e "--------------------------------------------\n$command\n"
-$command
+redis-cli --cluster rebalance $node1:6379 --cluster-use-empty-masters | grep Rebalancing
 
-command="redis-cli --cluster check $node1:6379"
+command="redis-cli -h $node3 -p 6379 cluster info | grep cluster_size"
+echo -e "--------------------------------------------\n$command\n"
+redis-cli -h $node3 -p 6379 cluster info | grep cluster_size
+
+command="redis-cli --cluster check $node3:6379"
 echo -e "--------------------------------------------\n$command\n"
 $command
