@@ -1,24 +1,91 @@
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '10.160.0.8,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '10.160.0.9,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '10.160.0.6,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '10.160.0.7,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.200.244.163,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.244.16.91,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.57.113,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
-ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '34.93.35.238,' -u ubuntu --private-key ../../redisgcp.pem ../../ansible/multiple/redis.yml
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+echo "run" > "./ansible_output/13.201.125.29"
+echo "run" > "./ansible_output/13.233.7.219"
+echo "run" > "./ansible_output/13.201.97.247"
+echo "run" > "./ansible_output/3.110.81.170"
+ssh-keygen -F "3.110.81.170" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "3.110.81.170"
+ssh-keygen -F "13.201.97.247" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.97.247"
+ssh-keygen -F "13.233.7.219" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.233.7.219"
+ssh-keygen -F "13.201.125.29" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.125.29"
+echo "run" > "./ansible_output/35.154.90.20"
+ssh-keygen -F "35.154.90.20" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "35.154.90.20"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.233.7.219,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.233.7.219'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.125.29,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.125.29'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.154.90.20,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/35.154.90.20'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.97.247,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.97.247'"
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+echo "run" > "./ansible_output/35.154.90.20"
+echo "run" > "./ansible_output/13.201.125.29"
+echo "run" > "./ansible_output/13.233.7.219"
+echo "run" > "./ansible_output/13.201.97.247"
+echo "run" > "./ansible_output/3.110.81.170"
+ssh-keygen -F "3.110.81.170" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "3.110.81.170"
+ssh-keygen -F "13.201.97.247" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.97.247"
+ssh-keygen -F "13.233.7.219" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.233.7.219"
+ssh-keygen -F "13.201.125.29" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.125.29"
+ssh-keygen -F "35.154.90.20" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "35.154.90.20"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.97.247,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.97.247'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '3.110.81.170,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/3.110.81.170'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.154.90.20,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/35.154.90.20'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.233.7.219,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.233.7.219'"
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+echo "run" > "./ansible_output/35.154.90.20"
+echo "run" > "./ansible_output/13.201.125.29"
+echo "run" > "./ansible_output/13.233.7.219"
+echo "run" > "./ansible_output/13.201.97.247"
+echo "run" > "./ansible_output/3.110.81.170"
+ssh-keygen -F "3.110.81.170" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "3.110.81.170"
+ssh-keygen -F "13.201.97.247" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.97.247"
+ssh-keygen -F "13.233.7.219" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.233.7.219"
+ssh-keygen -F "13.201.125.29" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.125.29"
+ssh-keygen -F "35.154.90.20" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "35.154.90.20"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.97.247,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.97.247'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '3.110.81.170,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/3.110.81.170'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.154.90.20,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/35.154.90.20'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.233.7.219,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.233.7.219'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.125.29,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.125.29'"
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+echo "run" > "./ansible_output/35.154.90.20"
+echo "run" > "./ansible_output/13.201.125.29"
+echo "run" > "./ansible_output/13.233.7.219"
+echo "run" > "./ansible_output/13.201.97.247"
+echo "run" > "./ansible_output/3.110.81.170"
+ssh-keygen -F "13.201.97.247" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.97.247"
+ssh-keygen -F "13.233.7.219" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.233.7.219"
+ssh-keygen -F "13.201.125.29" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.125.29"
+ssh-keygen -F "35.154.90.20" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "35.154.90.20"
+ssh-keygen -F "3.110.81.170" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "3.110.81.170"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.97.247,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.97.247'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.125.29,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.125.29'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.233.7.219,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.233.7.219'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '3.110.81.170,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/3.110.81.170'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.154.90.20,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/35.154.90.20'"
+rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*
+rm -rf $HOME/.ssh/known_hosts/known_hosts.* 
+echo "run" > "./ansible_output/35.154.90.20"
+echo "run" > "./ansible_output/13.201.125.29"
+echo "run" > "./ansible_output/13.233.7.219"
+echo "run" > "./ansible_output/13.201.97.247"
+echo "run" > "./ansible_output/3.110.81.170"
+ssh-keygen -F "3.110.81.170" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "3.110.81.170"
+ssh-keygen -F "13.201.97.247" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.97.247"
+ssh-keygen -F "13.233.7.219" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.233.7.219"
+ssh-keygen -F "13.201.125.29" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "13.201.125.29"
+ssh-keygen -F "35.154.90.20" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "35.154.90.20"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.97.247,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.97.247'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '3.110.81.170,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/3.110.81.170'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '35.154.90.20,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/35.154.90.20'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.233.7.219,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.233.7.219'"
+tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '13.201.125.29,' -u ubuntu --private-key ../../redisaws.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=aws">> './ansible_output/13.201.125.29'"

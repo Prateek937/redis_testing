@@ -1,0 +1,201 @@
+ubuntu@redis-3:~/testing$ ./script.sh
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 0 keys in 1 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+CREATING CLUSTER
+
+[OK] All nodes agree about slots configuration.
+[OK] All 16384 slots covered.
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5462 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+ADDING 4TH NODE
+
+>>> Adding node 10.160.0.46:6379 to cluster 10.160.0.45:6379
+>>> Performing Cluster Check (using node 10.160.0.45:6379)
+M: 71b9ad2716e0b5f956b3d91a3c586352f0268efc 10.160.0.45:6379
+   slots:[0-5460] (5461 slots) master
+M: 7b0eb7ec8298ed775b60ed14370d39f0e61b70ac 10.160.0.48:6379
+   slots:[10923-16383] (5461 slots) master
+M: 73212eaf3c2983c9646442164a0c2930d2e581c7 10.160.0.47:6379
+   slots:[5461-10922] (5462 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 10.160.0.46:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 10.160.0.46:6379
+>>> Send CLUSTER MEET to node 10.160.0.46:6379 to make it join the cluster.
+[OK] New node added correctly.
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.46:6379 (18bbd81b...) -> 0 keys | 0 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5462 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALACING
+
+>>> Rebalancing across 4 nodes. Total weight = 4.00
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 4096 slots | 0 slaves.
+10.160.0.46:6379 (18bbd81b...) -> 0 keys | 4096 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 4096 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 4 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+RESHARDING FROM
+
+Ready to move 4096 slots.
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 8192 slots | 1 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 4096 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REMOVING 4TH NODE
+
+>>> Removing node 18bbd81b8117aeb9672982fd4334e4c0f120cb5f from cluster 10.160.0.46:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> Sending CLUSTER RESET SOFT to the deleted node.
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 8192 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 4096 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 4096 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALANCING
+
+>>> Rebalancing across 3 nodes. Total weight = 3.00
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5462 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+ADDING 4TH NODE
+
+>>> Adding node 10.160.0.46:6379 to cluster 10.160.0.45:6379
+>>> Performing Cluster Check (using node 10.160.0.45:6379)
+M: 71b9ad2716e0b5f956b3d91a3c586352f0268efc 10.160.0.45:6379
+   slots:[2731-6826],[10923-12287] (5461 slots) master
+M: 7b0eb7ec8298ed775b60ed14370d39f0e61b70ac 10.160.0.48:6379
+   slots:[0-1365],[12288-16383] (5462 slots) master
+M: 73212eaf3c2983c9646442164a0c2930d2e581c7 10.160.0.47:6379
+   slots:[1366-2730],[6827-10922] (5461 slots) master
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+>>> Getting functions from cluster
+>>> Send FUNCTION LIST to 10.160.0.46:6379 to verify there is no functions in it
+>>> Send FUNCTION RESTORE to 10.160.0.46:6379
+>>> Send CLUSTER MEET to node 10.160.0.46:6379 to make it join the cluster.
+[OK] New node added correctly.
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5462 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALACING
+
+>>> Rebalancing across 4 nodes. Total weight = 4.00
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5462 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+RESHARDING FROM
+
+*** Please fix your cluster problems before resharding
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5462 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REMOVING 4TH NODE
+
+>>> Removing node 18bbd81b8117aeb9672982fd4334e4c0f120cb5f from cluster 10.160.0.46:6379
+>>> Sending CLUSTER FORGET messages to the cluster...
+>>> Sending CLUSTER RESET SOFT to the deleted node.
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5462 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------
+
+REBALANCING
+
+
+-----------------------------------------
+
+10.160.0.45:6379 (71b9ad27...) -> 0 keys | 5461 slots | 0 slaves.
+10.160.0.48:6379 (7b0eb7ec...) -> 0 keys | 5462 slots | 0 slaves.
+10.160.0.47:6379 (73212eaf...) -> 0 keys | 5461 slots | 0 slaves.
+[OK] 0 keys in 3 masters.
+0.00 keys per slot on average.
+
+-----------------------------------------

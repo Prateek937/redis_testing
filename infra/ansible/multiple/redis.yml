@@ -2,11 +2,11 @@
   gather_facts: no
   vars:
   # - redis_url: "https://github.com/redis/redis/archive/refs/tags/7.2.4.tar.gz"
-  # - redis_url: "https://download.redis.io/redis-stable.tar.gz"
+  - redis_url: "https://download.redis.io/redis-stable.tar.gz"
   # - redis_url: "https://download.redis.io/releases/redis-6.2.14.tar.gz"
-  - redis_url: "https://download.redis.io/releases/redis-7.0.15.tar.gz"
+  # - redis_url: "https://download.redis.io/releases/redis-7.0.15.tar.gz"
   - rediszip_path: "/home/ubuntu/redis_stable.tar.gz"
-  - redis_path: "/home/ubuntu/redis-7.0.15"
+  - redis_path: "/home/ubuntu/redis-stable"
   - home: "/home/ubuntu"
   - change_lines:
     - key: "# cluster-enabled yes"
@@ -55,6 +55,7 @@
   - name: Install prerequisites for redis
     package:
       name:
+      - git
       - tar
       - jq
       - gcc
@@ -81,7 +82,7 @@
 
   - name: Copy inventory.json
     copy:
-      src: "../../terraform/multiple/inventory.json"
+      src: "../../terraform/multiple/{{cloud}}/inventory.json"
       dest: "{{home}}/testing/"
       
   - name: Download redis-stable zip file
@@ -100,18 +101,18 @@
     args:
       chdir: "{{redis_path}}"
 
-  - name: Build the distclean target
+  - name: make distclean target
     make:
       chdir: "{{redis_path}}"
       target: distclean
     ignore_errors: true
 
-  - name: change to the default target
+  - name: run make 
     make:
       chdir: "{{redis_path}}"
     ignore_errors: true
 
-  - name: Build the default target
+  - name: make install
     make:
       chdir: "{{redis_path}}"
       target: install
