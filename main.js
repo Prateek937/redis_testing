@@ -74,10 +74,10 @@ function removeNodes(clusterNodes, removeCount, next) {
             next => async.series([
                 next => cluster.removeMaster(clusterNodes[clusterSize - i - 1], log(next)),
                 next => cluster.check(clusterNodes[0], log(next)),
-                next => wait(60, next),
                 next => {clusterSize -= 1; next(null);}
             ], next)
-        ], next), next) 
+        ], next), next),
+        next => wait(60, next), 
     ], next);
 }
 
