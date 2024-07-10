@@ -1,6 +1,7 @@
 const shell = require('./shell');
 const async = require('async');
 
+
 const float = function(...args) {
     const next = args.pop();
 	return function(err, ...results) { if (err) return next(err);
@@ -8,7 +9,7 @@ const float = function(...args) {
 	}
 };
 
-const logCommand = (text) => console.log(`\x1b[31m${text}\x1b[0m`);
+const logCommand = (text) => console.log(`\x1b[33m${text}\x1b[0m`);
 
 module.exports.check = (node, next) => {
     logCommand(`### CHECK NODE ${node.host}:${node.port} ###\n`);
@@ -126,7 +127,7 @@ module.exports.reshard = (nodeTo, nodeFrom, slots, next) => {
 }
 
 module.exports.writeKeys = (clusterNodes, keyCount, startTime, next) => {
-    logCommand(`### WRITING ${keys} KEYS ###\n`);
+    logCommand(`### WRITING ${keyCount} KEYS ###\n`);
     const cluster = new Redis.Cluster(clusterNodes);
     const atOnce = keyCount < 1000000 ? keyCount : 1000000
     async.timesSeries(keyCount/atOnce, (i, next) => 

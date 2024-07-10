@@ -1,10 +1,14 @@
 const file = require('fs');
-const {run} = require('../../../modules/shell');
+const {run} = require('../modules/shell');
 const async = require('async');
 
+const ansibleLogs = `./logs/ansible`;
+const inventory = `./terraform/multiple/${process.argv[2]}/inventory.json`;
+const inventoryRaw = `./terraform/multiple/${process.argv[2]}/inventory_raw.json`;
+
 const processInventory = {
-    aws: (inventory, next) => {
-        const nodes = require(inventory);
+    aws: next => {
+        const nodes = require(inventoryRaw);
         let content = [];
         for (let i = 0; i < nodes.length; i++) {
             content.push({
@@ -12,11 +16,11 @@ const processInventory = {
                 public_ip: nodes[i].public_ip,
                 port: 6379
             });
-        }
-        file.writeFile(`./${process.argv[2]}/inventory.json`, JSON.stringify(content, null, 2), next);
+        }        
+        file.writeFile(inventory, JSON.stringify(content, null, 2), next);
     },
-    gcp: (inventory, next) => {
-        const nodes = require(inventory);
+    gcp: next => {
+        const nodes = require(inventoryRaw);
         let content = [];
         for (let i = 0; i < nodes.length; i++) {
             content.push({
@@ -25,16 +29,17 @@ const processInventory = {
                 port: 6379
             });
         }
-        file.writeFile(`./${process.argv[2]}/inventory.json`, JSON.stringify(content, null, 2), next);
+        file.writeFile(inventory, JSON.stringify(content, null, 2), next);
     }
 }
 
 const runAnsible = (nodes, next) => {
     async.eachOf(nodes, (item, key, next) => {
         async.series([
-            next => run(`echo "run" > "./ansible_output/${item.public_ip}"`, next),
+            next => run(`mkdir ${ansibleLogs}`, next),
+            next => run(`echo "run" > "${ansibleLogs}/${item.public_ip}"`, next),
             next => run(`ssh-keygen -F "${item.public_ip}" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${item.public_ip}"`, next),
-            next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ../../redis${process.argv[2]}.pem ../../ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> './ansible_output/${item.public_ip}'"`, (err, result)=>{
+            next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, (err, result)=>{
                 if (err) next(err);
                 console.log(result);
                 next(null);
@@ -45,12 +50,11 @@ const runAnsible = (nodes, next) => {
 
 let nodes;
 async.series([
-    next => processInventory[process.argv[2]](`./${process.argv[2]}/inventory_raw.json`, next),
+    next => processInventory[process.argv[2]](next),
     next => {
-        nodes = require(`./${process.argv[2]}/inventory.json`);
+        nodes = require(inventory);
         next(null);
     },
-    next => run(`rm -rf $HOME/jungleio/redis_testing/infra/terraform/multiple/ansible_output/*`, next),
     next => run(`rm -rf $HOME/.ssh/known_hosts/known_hosts.* `, next),
     // next => setTimeout(() => {next(null)}, 15000),
     next => runAnsible(nodes, next),

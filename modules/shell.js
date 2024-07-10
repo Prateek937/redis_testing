@@ -11,8 +11,11 @@ module.exports.runSync = (command) => {
 }
 
 module.exports.run = (command, next) => {
-    try {file.appendFileSync('commands.txt', command + '\n');}
-    catch (err) {file.writeFileSync('commands.txt', command + '\n');}
+    if (!file.existsSync('./logs')){
+        file.mkdirSync('./logs');
+    }
+    try {file.appendFileSync('./logs/commands.txt', command + '\n');}
+    catch (err) {file.writeFileSync('./logs/commands.txt', command + '\n');}
 
     exec(command, (err, stdout, stderr) => {
     if (stderr) return next(stderr);

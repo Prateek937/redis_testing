@@ -51,7 +51,12 @@ function log(next) {
 
 function addNodes(clusterNode, nodesToAdd, next) {
     async.series([
-        next => async.eachOfSeries(nodesToAdd, (node, index, next) => cluster.addMaster(clusterNode, node, log(next)), next),
+        next => async.eachOfSeries(nodesToAdd, (node, index, next) => {
+            async.series([
+                next => cluster.addMaster(clusterNode, node, log(next)),
+                next => wait(2, log(next))
+            ], next);
+        }, next),
         next => wait(10, log(next)),
         next => cluster.check(clusterNode, log(next)),
         next => cluster.rebalance(nodesToAdd[0], log(next)),
@@ -127,7 +132,7 @@ async.waterfall([
     },
     next => async.eachOfSeries(inputs.changes, (change, key, next) => {
         console.log('------------------------------------------------------------------');
-        console.log(`\n${blue}******* ${change.type}, ${change.value} *******${reset}\n` );
+        console.log(`\n${blue}******* ${change.type} ${change.value === undefined ? '' : ', ' + change.value} *******${reset}\n` );
         switch (change.type) {
             case 'init': {
                 if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes
@@ -144,13 +149,3 @@ async.waterfall([
     printTime(Date.now() - startTime);
     console.log('---DONE---', ...args);
 });
-
-// 7* type value 7* - per change
-// 3# redisCommand, args, 3# - per redis instruction
-// success {redisCommand} or the error
-// Count - after every redis instruction
-
-
-// no need to store the latest. ask the clutster
-
-// log of output
