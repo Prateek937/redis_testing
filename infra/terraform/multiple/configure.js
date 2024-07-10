@@ -1,29 +1,29 @@
 const file = require('fs');
-const {run} = require('../../../modules/run');
+const {run} = require('../../../modules/shell');
 const async = require('async');
 
 const processInventory = {
     aws: (inventory, next) => {
         const nodes = require(inventory);
-        let content = {};
+        let content = [];
         for (let i = 0; i < nodes.length; i++) {
-            content[`node${i+1}`] = {
-                private_ip: nodes[i].private_ip,
+            content.push({
+                host: nodes[i].private_ip,
                 public_ip: nodes[i].public_ip,
                 port: 6379
-            }
+            });
         }
         file.writeFile(`./${process.argv[2]}/inventory.json`, JSON.stringify(content, null, 2), next);
     },
     gcp: (inventory, next) => {
         const nodes = require(inventory);
-        let content = {};
+        let content = [];
         for (let i = 0; i < nodes.length; i++) {
-            content[`node${i+1}`] = {
+            content.push({
                 public_ip: nodes[i].network_interface[0].access_config[0].nat_ip,
-                private_ip: nodes[i].network_interface[0].network_ip,
+                host: nodes[i].network_interface[0].network_ip,
                 port: 6379
-            }
+            });
         }
         file.writeFile(`./${process.argv[2]}/inventory.json`, JSON.stringify(content, null, 2), next);
     }

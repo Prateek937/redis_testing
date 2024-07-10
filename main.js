@@ -1,25 +1,18 @@
 const file = require('fs');
 const async = require('async');
 const prompt = require('prompt-sync')();
-const addNode = require('./modules/addNode');
-const countSlotKeys = require('./modules/countSlotKeys');
-const cluster = require('./modules/createCluster');
-const rebalance = require('./modules/rebalance');
-const removeMaster = require('./modules/removeMaster');
-const reshard = require('./modules/reshard');
-const writeKeys = require('./modules/writeKeys');
-const flushdb = require('./modules/flushdb');
+const cluster = require('./modules/cluster');
 const inputs = require('./inputs');
-
 
 const min = inputs.min;
 const max = inputs.max;
 const nodes = require('./inventory.json');
-let latest;
-try {
-    latest = require('./latest.json').latest;
-} catch (err) {
-    latest = 0;
+let clusterSize;
+
+function reverse(object) {
+    const reversed = {};
+    Object.keys(object).reverse().map(key => reversed[key] = object[key]);
+    return reversed;
 }
 
 function printTime(timeTaken) {
@@ -40,210 +33,100 @@ function wait(seconds, next) {
     });
 }
 
-function count(next) {
-    console.log(`### COUNT NODES ###\n`);
-    countSlotKeys.countSlotKey(nodes.node1.private_ip, nodes.node1.port, (err, result) => {
-        if (err) return next(err);
-        console.log(`${result}`);
-        next(null);
-    });
-}
-
-function reverse(object) {
-    const reversed = {};
-    Object.keys(object).reverse().map(key => reversed[key] = object[key]);
-    return reversed;
-}
-
-function createClusterofThreeNodes(next) {
-    console.log(`### CREATING CLUSTER OF 3 NODES ###\n`);
-    const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, 3));
-    async.series([
-        next => cluster.createCluster(clusterNodes, (err, result) => {
-            if (err) return next(err);
-            console.log(`${result}`);
-            console.log("### FLUSHING DATABASE ###\n");
-            printTime(Date.now() - startTime);
-        }),
-        next => flushdb.flushall(clusterNodes, next),
-        next => count(next),
-        next => {
-            latest = 3;
-            file.writeFile('./latest.json', JSON.stringify({ latest: 3 }, null, 2), next)
-        }
-    ], next);
-}
-
-function rebalanceCluster(node, next) {
-    console.log("### REBALANCING CLUSTER ###\n");
-    const st1 = Date.now()
-    rebalance.rebalanceCluster(node.private_ip, node.port, (err, result) => {
-        if (err) return next(err);
-        console.log(`${result}`);
-        printTime(Date.now() - st1);
-        next(null);
-    });
-}
-
-function reshardNode(nodeFrom, nodeTo, next) {
-    console.log(`### RESHARDING FROM ${nodeFrom.private_ip} TO ${nodeTo.private_ip} ###\n`);
+function log(next) {
     const st1 = Date.now();
-    reshard.reshard(nodeTo, nodeFrom, (err, result) => {
+    return (err, ...args) => {
         if (err) return next(err);
-        console.log(`${result}`);
+        console.log(...args);
         printTime(Date.now() - st1);
-        next(null);
-    });
-}
-
-function removeNode(host, port, next) {
-    console.log(`### REMOVING ${host}:${port} FROM CLUSTER ###\n`);
-    const st1 = Date.now();
-    removeMaster.removeMaster(host, port, (err, result) => {
-        if (err) return next(err);
-        console.log(`${result}`);
-        printTime(Date.now() - st1);
-        next(null);
-    });
-}
-
-function addMasterNode(nodeTo, node, next) {
-    console.log(`### ADDING ${node.private_ip}:${node.port} NODE TO CLUSTER ###\n`);
-    const st1 = Date.now();
-    addNode.addMaster(nodeTo, node, (err, result) => {
-        if (err) return next(err);
-        console.log(`${result}`);
-        printTime(Date.now() - st1);
-        next(null);
-    });
-}
-
-function addKeys(keys, next) {
-    console.log(`### WRITING ${keys} KEYS ###\n`);
-    const st1 = Date.now();
-    let clusterNodes = [];
-    const nodeList = Object.keys(nodes);
-    for (let i = 0; i < latest; i++) {
-        let node = nodes[nodeList[i]];
-        clusterNodes.push({ host: node.private_ip, port: node.port });
+        next(null, ...args);
     }
-    // build unique keys from `${starttime}:${counter}`
-    writeKeys.writeKeys(clusterNodes, keys, startTime, (err, result) => {
-        if (err) return next(err);
-        console.log(`${result}`);
-        printTime(Date.now() - st1);
-        count(next);
-    });
 }
 
-
-function flushCluster(next) {
-    console.log("### FLUSHING DATABASE ###\n");
-    const clusterNodes = Object.fromEntries(Object.entries(nodes).slice(0, latest));
-    flushdb.flushall(clusterNodes, next);
-}
-
-function minimizeClusterToThreeNodes(next) {
-    // console.log(`MINIMIZING CLUSTER TO 3 NODES------------------------\n\n`)
+function addNodes(addTo, nodesToAdd, next) {
     async.series([
-        // flush the current cluster
-        next => flushCluster(next),
-        next => count(next),
-        // reshard -diff nodes, always take from the highest and put to the lowest
-        next => {
-            const nodesFrom = reverse(Object.fromEntries(Object.entries(nodes).slice(3, latest)));
-            const nodesTo = Object.fromEntries(Object.entries(nodes).slice(0, 3))
-            async.timesSeries(Object.keys(nodesFrom).length, (i, next) => reshardNode(nodesFrom[Object.keys(nodesFrom)[i]], nodesTo[Object.keys(nodesTo)[i % 3]], next), next)
-        },
-        next => wait(10, next),
-        next => count(next),
-        // delete -diff nodes, always delete the highest
-        next => {
-            const removeNodes = reverse(Object.fromEntries(Object.entries(nodes).slice(3, latest)));
-            async.eachOf(removeNodes, (node, nodeName, next) => removeNode(node.private_ip, node.port, next), next);
-        },
-        next => count(next),
-        next => {
-            latest = 3;
-            file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next);
-        }
+        next => async.eachOfSeries(nodesToAdd, (node, index, next) => cluster.addMaster(addTo, node, log(next)), next),
+        next => wait(2, log(next)),
+        next => cluster.check(addTo, log(next)),
+        next => cluster.rebalance(nodesToAdd[0], log(next)),
+        next => cluster.check(addTo, log(next)),
+        next => {clusterSize += 1; next(null);}
     ], next);
 }
 
-function resizeCluster(nodeCount, next) {
-    if (nodeCount < min || nodeCount > max) return next(error);
-    // console.log(`RESIZING CLUSTER FROM ${latest} TO ${nodeCount} NODES------------------------\n\n`)
-    const diff = nodeCount - latest;
-    if (diff < 0) async.series([
-        // reshard -diff nodes, always take from the highest and put to the lowest
-        next => {
-            const nodesFrom = reverse(Object.fromEntries(Object.entries(nodes).slice(nodeCount, latest)));
-            const nodesTo = Object.fromEntries(Object.entries(nodes).slice(0, nodeCount))
-            //try parallaly as well
-            async.timesSeries(Object.keys(nodesFrom).length, (i, next) => reshardNode(nodesFrom[Object.keys(nodesFrom)[i]], nodesTo[Object.keys(nodesTo)[i % nodeCount]], next), next)
-        },
-        next => wait(10, next),
-        next => count(next),
-        // delete -diff nodes, always delete the highest
-        next => {
-            const removeNodes = reverse(Object.fromEntries(Object.entries(nodes).slice(nodeCount, latest)));
-            async.eachOfSeries(removeNodes, (node, nodeName, next) => removeNode(node.private_ip, node.port, next), next);
-        },
-        next => {
-            latest = nodeCount;
-            file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next)
-        },
-        next => count(next),
-        // rebalance
-        next => rebalanceCluster(nodes[Object.keys(nodes)[nodeCount - 1]], next),
-        next => wait(5, next),
-        next => count(next),
-        // store latest to file
-        next => {
-            latest = nodeCount;
-            file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next);
-        }
+function removeNodes(clusterNodes, removeCount, next) {
+    const clusterSize = clusterNodes.length;
+    const remaining = clusterSize - removeCount;
+    if (clusterSize < removeCount) return next(new Error("removing more than cluster size is not possible."));
+    async.series([
+        next => cluster.rebalance(clusterNodes[clusterSize - i - 1], next),
+        next => async.timesSeries(removeCount, (i, next) => async.waterfall([
+            next => cluster.countSlots(clusterNodes[clusterSize - i - 1], next),
+            (slots, next) => async.timesSeries(remaining, (n, next) => {
+                let slotsToReshard = (i+1 == remaining) ?  (slots/(remaining)) + (slots % (remaining)) : (slots/(remaining));
+                console.log({reshardTo: clusterNodes[n], reshardFrom: clusterNodes[clusterSize - i - 1], slotsToReshard});
+                async.series([
+                    next => cluster.reshard(clusterNodes[n], clusterNodes[clusterSize - i - 1], slotsToReshard, log(next)),
+                    next => wait(2, log(next)),
+                    next => cluster.check(clusterNodes[0], log(next)),
+                ], next);
+            }, next),
+            next => async.series([
+                next => cluster.removeMaster(clusterNodes[clusterSize - i - 1], log(next)),
+                next => cluster.check(clusterNodes[0], log(next)),
+                next => {clusterSize -= 1; next(null);}
+            ], next)
+        ], next), next) 
     ], next);
-    else if (diff > 0) async.series([
-        // add diff nodes, always add the highest
-        next => {
-            const addNodes = Object.fromEntries(Object.entries(nodes).slice(latest, nodeCount));
-            //doing in series because if one node fails to add, remaining are added then if we run it again it creates problems
-            async.eachOfSeries(addNodes, (node, key, next) => addMasterNode(nodes.node1, node, next), next);
-        },
-        next => {
-            latest = nodeCount;
-            file.writeFile('./latest.json', JSON.stringify({ latest }, null, 2), next)
-        },
-        next => wait(5, next),
-        next => count(next),
-        // rebalance
-        next => rebalanceCluster(nodes[Object.keys(nodes)[latest - 1]], next),
-        next => wait(5, next),
-        next => count(next),
-    ], next);
+}
+
+function resizeCluster(clusterNodes, resizeTo, next) {
+    if (nodeCount < min || nodeCount > max) return next(new Error(`resize count not in range [${min}, ${max}]`));
+    const diff = resizeTo - clusterNodes.length;
+    if (diff < 0) removeNodes(clusterNodes, -1 * diff, next);
+    else if (diff > 0) addNodes(clusterNodes[0], nodes.slice(clusterNodes.length, resizeTo), next);
     else next(null);
 }
 
+function createCluster(clusterNodes, next) {
+    cluster.createCluster(clusterNodes, log((err, result) => {
+        if (err) return next(err);
+        clusterSize = clusterNodes.length;
+        next(null, result)
+    }));
+}
+
+function log(next) {
+    const st1 = Date.now();
+    return (err, ...args) => {
+        if (err) return next(err);
+        console.log(...args);
+        printTime(Date.now() - st1);
+        next(null, ...args);
+    }
+}
+
 const startTime = Date.now();
-async.series([
-    next => {
-        console.log({ latest });
-        if (latest > 0) return count(next);;
-        next(null)
+async.waterfall([
+    next => cluster.countNodes(nodes[0], next),
+    (result, next) => {
+        clusterSize = result;
+        console.log(`cluster Size: ${clusterSize}`);
+        if (clusterSize > 1) return cluster.check(nodes[0], log(next));
+        next(null);
     },
     next => async.eachOfSeries(inputs.changes, (change, key, next) => {
         console.log('------------------------------------------------------------------');
         console.log(`\n******* ${change.type}, ${change.value} *******\n`);
         switch (change.type) {
             case 'init': {
-                if (latest < 3) return createClusterofThreeNodes(next);
-                if (latest > 3) return minimizeClusterToThreeNodes(next);
-                return flushCluster(next);
+                if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes
+                if (clusterSize > 3) return resizeCluster(nodes.slice(0, clusterSize), 3, next); //resize to thee nodes
+                return cluster.flushall(nodes.slice(0, 3), log(next)); 
             }
-            case 'write': return addKeys(change.value, next);
-            case 'flush': return flushCluster(next);
-            case 'resize': return resizeCluster(change.value, next);
+            case 'write': return cluster.writeKeys(nodes.slice(0, clusterSize), change.value, startTime, log(next));
+            case 'flush': return cluster.flushall(nodes.slice(0, clusterSize), log(next));
+            case 'resize': return resizeCluster(nodes.slice(0, clusterSize), change.value, next);
             default: next(`Unknown operation ${change.type}`)
         }
     }, next)
@@ -251,7 +134,6 @@ async.series([
     printTime(Date.now() - startTime);
     console.log('---DONE---', ...args);
 });
-
 
 // 7* type value 7* - per change
 // 3# redisCommand, args, 3# - per redis instruction
