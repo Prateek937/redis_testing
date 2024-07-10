@@ -3,11 +3,17 @@ const async = require('async');
 const prompt = require('prompt-sync')();
 const cluster = require('./modules/cluster');
 const inputs = require('./inputs');
-
 const min = inputs.min;
 const max = inputs.max;
 const nodes = require('./inventory.json');
 let clusterSize;
+
+// ANSI escape codes for text color
+const red = '\x1b[31m';
+const green = '\x1b[32m';
+const blue = '\x1b[34m';
+const reset = '\x1b[0m';
+
 
 function reverse(object) {
     const reversed = {};
@@ -26,10 +32,10 @@ function wait(seconds, next) {
             process.stdout.write(`${seconds - i} `);
             next(null);
         }, 1000);
-    }, (err, results) => {
+    }, (err) => {
         if (err) return next(err);
         console.log('\n');
-        next(null, results);
+        next(null);
     });
 }
 
@@ -43,58 +49,61 @@ function log(next) {
     }
 }
 
-function addNodes(addTo, nodesToAdd, next) {
+function addNodes(clusterNode, nodesToAdd, next) {
     async.series([
-        next => async.eachOfSeries(nodesToAdd, (node, index, next) => cluster.addMaster(addTo, node, log(next)), next),
-        next => wait(2, log(next)),
-        next => cluster.check(addTo, log(next)),
+        next => async.eachOfSeries(nodesToAdd, (node, index, next) => cluster.addMaster(clusterNode, node, log(next)), next),
+        next => wait(10, log(next)),
+        next => cluster.check(clusterNode, log(next)),
         next => cluster.rebalance(nodesToAdd[0], log(next)),
-        next => cluster.check(addTo, log(next)),
+        next => cluster.check(clusterNode, log(next)),
         next => {clusterSize += 1; next(null);}
     ], next);
 }
 
 function removeNodes(clusterNodes, removeCount, next) {
-    const clusterSize = clusterNodes.length;
     const remaining = clusterSize - removeCount;
     if (clusterSize < removeCount) return next(new Error("removing more than cluster size is not possible."));
     async.series([
-        next => cluster.rebalance(clusterNodes[clusterSize - i - 1], next),
+        next => cluster.rebalance(clusterNodes[clusterSize - 1], next),
+        next => cluster.check(clusterNodes[0], log(next)),
         next => async.timesSeries(removeCount, (i, next) => async.waterfall([
-            next => cluster.countSlots(clusterNodes[clusterSize - i - 1], next),
+            next => cluster.countSlots(clusterNodes[clusterSize - 1], next),
             (slots, next) => async.timesSeries(remaining, (n, next) => {
-                let slotsToReshard = (i+1 == remaining) ?  (slots/(remaining)) + (slots % (remaining)) : (slots/(remaining));
-                console.log({reshardTo: clusterNodes[n], reshardFrom: clusterNodes[clusterSize - i - 1], slotsToReshard});
+                let slotsToReshard = (n+1 == remaining) ?  Math.floor(slots/remaining) + (slots % (remaining)) : Math.floor(slots/(remaining));
                 async.series([
-                    next => cluster.reshard(clusterNodes[n], clusterNodes[clusterSize - i - 1], slotsToReshard, log(next)),
+                    next => cluster.reshard(clusterNodes[n], clusterNodes[clusterSize - 1], slotsToReshard, log(next)),
                     next => wait(2, log(next)),
                     next => cluster.check(clusterNodes[0], log(next)),
                 ], next);
             }, next),
-            next => async.series([
-                next => cluster.removeMaster(clusterNodes[clusterSize - i - 1], log(next)),
+            (ignore, next) => async.series([
+                next => cluster.removeMaster(clusterNodes[clusterSize - 1], log(next)),
                 next => cluster.check(clusterNodes[0], log(next)),
                 next => {clusterSize -= 1; next(null);}
             ], next)
         ], next), next),
-        next => wait(60, next), 
+        next => wait(65, log(next)), // wait for 60 seconds for the nodes to be readded
     ], next);
 }
 
 function resizeCluster(clusterNodes, resizeTo, next) {
-    if (nodeCount < min || nodeCount > max) return next(new Error(`resize count not in range [${min}, ${max}]`));
+    if (resizeTo < min || resizeTo > max) return next(new Error(`resize count not in range [${min}, ${max}]`));
     const diff = resizeTo - clusterNodes.length;
-    if (diff < 0) removeNodes(clusterNodes, -1 * diff, next);
+    if (diff < 0) removeNodes(clusterNodes, -diff, next);
     else if (diff > 0) addNodes(clusterNodes[0], nodes.slice(clusterNodes.length, resizeTo), next);
     else next(null);
 }
 
 function createCluster(clusterNodes, next) {
-    cluster.createCluster(clusterNodes, log((err, result) => {
-        if (err) return next(err);
-        clusterSize = clusterNodes.length;
-        next(null, result)
-    }));
+    async.series([
+        next => cluster.createCluster(clusterNodes, (err, result) => {
+            if (err) return next(err);
+            clusterSize = clusterNodes.length;
+            console.log(result);
+            next(null, result);
+        }),
+        next => cluster.check(clusterNodes[0], log(next))
+    ], next);
 }
 
 function log(next) {
@@ -118,7 +127,7 @@ async.waterfall([
     },
     next => async.eachOfSeries(inputs.changes, (change, key, next) => {
         console.log('------------------------------------------------------------------');
-        console.log(`\n******* ${change.type}, ${change.value} *******\n`);
+        console.log(`\n${blue}******* ${change.type}, ${change.value} *******${reset}\n` );
         switch (change.type) {
             case 'init': {
                 if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes

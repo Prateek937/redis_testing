@@ -8,8 +8,10 @@ const float = function(...args) {
 	}
 };
 
+const logCommand = (text) => console.log(`\x1b[31m${text}\x1b[0m`);
+
 module.exports.check = (node, next) => {
-    console.log(`### CHECK NODE ${node.host}:${node.port} ###\n`);
+    logCommand(`### CHECK NODE ${node.host}:${node.port} ###\n`);
     const command = `redis-cli --cluster check ${node.host}:${node.port} | grep keys | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     shell.run(command, (err, result) => err ? next(err) : next(null, result));
 }
@@ -35,9 +37,9 @@ module.exports.countNodes = (node, next) => {
 module.exports.createCluster = (nodes, next) => {
     let clusterNodes = '';
     nodes.forEach(node => clusterNodes += ` ${node.host}:${node.port}`); // creating a space separated list of nodes
-    console.log(`### CREATING CLUSTER OF 3 NODES ${clusterNodes} ###\n`);
+    logCommand(`### CREATING CLUSTER OF 3 NODES ${clusterNodes} ###\n`);
     const command = `redis-cli --cluster create ${clusterNodes} --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
-    console.log(command);
+    console.log(`> ${command}`);
     shell.run(command, (err, result) => {
         if (err) return next(err);
         if (result.includes('All nodes agree')) return next(null, 'cluster created successfully');
@@ -46,21 +48,21 @@ module.exports.createCluster = (nodes, next) => {
 }
 
 module.exports.flushall = (nodes, next) => {
-    console.log(`### FLUSHING DATABASE : ${node.host}:${node.port} ###\n`);
     async.eachOf(nodes, (node, nodeName, next) => {
+        logCommand(`### FLUSHING DATABASE : ${node.host}:${node.port} ###`);
         const command = `redis-cli -h ${node.host} -p ${node.port} flushall`;
-        console.log(command);
+        console.log(`> ${command}`);
         shell.run(command, next);
     }, (err) => {
         if (err) return next(err);
-        next(null, 'flushed successfully!');
+        next(null, 'cluster flushed successfully!');
     });
 }
 
 module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
-    console.log(`### ADDING ${node.host}:${node.port} NODE TO CLUSTER ###\n`);
+    logCommand(`### ADDING ${nodeToAdd.host}:${nodeToAdd.port} NODE TO CLUSTER ###\n`);
     const command = `redis-cli --cluster add-node ${nodeToAdd.host}:${nodeToAdd.port} ${clusterNode.host}:${clusterNode.port} | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
-    console.log(command);
+    console.log(`> ${command}`);
     shell.run(command, (err, result) => {
         if (err) return next(err);
         const lines = result.split('\n');
@@ -74,29 +76,30 @@ module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
 }
 
 module.exports.rebalance = (node, next) => {
-    console.log(`### REBALANCING CLUSTER ON ${node.host}:${node.port} ###\n`);
-    const command = `redis-cli --cluster rebalance ${node.host}${node.port} --cluster-use-empty-masters`;
-    console.log(command)
+    logCommand(`### REBALANCING CLUSTER ON ${node.host}:${node.port} ###\n`);
+    const command = `redis-cli --cluster rebalance ${node.host}:${node.port} --cluster-use-empty-masters | grep -i Rebalancing`;
+    console.log(`> ${command}`)
     shell.run(command, (err, result) => {
         if (err) return next(err);
-        const lines = result.split('\n');
-        for (let line of lines) {
-            if (line.includes("Rebalancing")) return next(null, 'rebalanced successfully!');
-            if (line.includes("No rebalancing needed!")) return next(null, line);
-        }
-        next(`ERROR >>> ${result}`);
+        next(null, `${result}\n`)
+        // const lines = result.split('\n');
+        // for (let line of lines) {
+        //     if (line.includes("Rebalancing")) return next(null, 'rebalanced successfully!\n');
+        //     if (line.includes("No rebalancing needed!")) return next(null, line+'\n');
+        // }
+        // next(`ERROR >>> ${result}`);
     });
 }
 
 module.exports.removeMaster = (node, next) => {
-    console.log(`### REMOVING ${node.host}:${node.port} FROM CLUSTER ###\n`);
+    logCommand(`### REMOVING ${node.host}:${node.port} FROM CLUSTER ###\n`);
     const nodeIdCommand = `redis-cli -h ${node.host} -p ${node.port} CLUSTER MYID`;
     async.waterfall([
         next => shell.run(nodeIdCommand, (err, result) =>err ? next(err) : next(null, result.trim())),
         (nodeId, next) => {
             // const resultCommand = `redis-cli -h ${node} -p ${port} cluster forget ${nodeId}`;
             const resultCommand = `redis-cli --cluster del-node ${node.host}:${node.port} ${nodeId}`;
-            console.log(command)
+            console.log(`> ${resultCommand}`);
             shell.run(resultCommand, (err, result) => err ? next(err) : next(null, result.trim()));
         }
     ],  (err, result) => {
@@ -107,9 +110,10 @@ module.exports.removeMaster = (node, next) => {
 }
 
 module.exports.reshard = (nodeTo, nodeFrom, slots, next) => {
-    console.log(`### RESHARDING FROM ${nodeFrom.host} TO ${nodeTo.host} ###\n`);
+    logCommand(`### RESHARDING FROM ${nodeFrom.host} TO ${nodeTo.host} ###\n`);
+    console.log({reshardTo: nodeTo.host, reshardFrom: nodeFrom.host, slots});
     const clusterToIdCommand = `redis-cli -h ${nodeTo.host} -p ${nodeTo.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
-    const clusterFromIdCommand = `redis-cli -h ${nodeFrom.port} -p ${nodeFrom.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
+    const clusterFromIdCommand = `redis-cli -h ${nodeFrom.host} -p ${nodeFrom.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
 
     async.waterfall([
         next => shell.run(clusterToIdCommand, (err, result) => err ? next(err) : next(null, result.trim())),
@@ -122,7 +126,7 @@ module.exports.reshard = (nodeTo, nodeFrom, slots, next) => {
 }
 
 module.exports.writeKeys = (clusterNodes, keyCount, startTime, next) => {
-    console.log(`### WRITING ${keys} KEYS ###\n`);
+    logCommand(`### WRITING ${keys} KEYS ###\n`);
     const cluster = new Redis.Cluster(clusterNodes);
     const atOnce = keyCount < 1000000 ? keyCount : 1000000
     async.timesSeries(keyCount/atOnce, (i, next) => 
