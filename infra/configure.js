@@ -36,7 +36,12 @@ const processInventory = {
 const runAnsible = (nodes, next) => {
     async.eachOf(nodes, (item, key, next) => {
         async.series([
-            next => run(`mkdir ${ansibleLogs}`, next),
+            next => {
+                if (!file.existsSync(ansibleLogs)){
+                    file.mkdirSync(ansibleLogs);
+                }
+                next(null);
+            },
             next => run(`echo "run" > "${ansibleLogs}/${item.public_ip}"`, next),
             next => run(`ssh-keygen -F "${item.public_ip}" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${item.public_ip}"`, next),
             next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, (err, result)=>{

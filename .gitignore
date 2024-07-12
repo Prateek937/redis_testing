@@ -63,3 +63,4 @@ infra/terraform/multiple/aws/inventory.json
 infra/terraform/multiple/gcp/inventory.json
 infra/logs/
 
+infra/terraform/multiple/aws/inventory.json

@@ -1,6 +1,6 @@
 const shell = require('./shell');
 const async = require('async');
-
+const Redis = require('ioredis');
 
 const float = function(...args) {
     const next = args.pop();
@@ -17,15 +17,45 @@ module.exports.check = (node, next) => {
     shell.run(command, (err, result) => err ? next(err) : next(null, result));
 }
 
-module.exports.countSlots = (node, next) => {
-    async.waterfall([
-        next => shell.run(`redis-cli -h ${node.host} -p ${node.port} CLUSTER NODES | grep "${node.host}:${node.port}" | awk '{print $1}'`, next),
-        (nodeId, next) => shell.run(`redis-cli -h ${node.host} -p ${node.port} CLUSTER NODES | grep "${nodeId}" | awk '{print $9}'`, next),
-        (slotRange, next) => {
-            let slots = slotRange.split('-');
-            next(null, parseInt(slots[1]) - parseInt(slots[0]) + 1);
+module.exports.getSlots = (node, next) => {
+    const redis = new Redis.Cluster([
+        {
+          host: node.host,
+          port: node.port
+        },
+        // Add more nodes if necessary
+      ]);
+      const slotDistribution = {};
+      async function getSlotDistribution() {
+        try {
+          const slots = await redis.cluster('slots');
+      
+          slots.forEach(slotRange => {
+            const startSlot = slotRange[0];
+            const endSlot = slotRange[1];
+            const nodeInfo = slotRange[2];
+            const nodeIp = nodeInfo[0];
+            const nodePort = nodeInfo[1];
+            const nodeId = `${nodeIp}:${nodePort}`;
+      
+            const slotCount = endSlot - startSlot + 1;
+      
+            if (!slotDistribution[nodeId]) {
+              slotDistribution[nodeId] = 0;
+            }
+            slotDistribution[nodeId] += slotCount;
+          });
+      
+        } catch (err) {
+          console.error('Error fetching slot distribution:', err);
+        } finally {
+          redis.disconnect();
+          next(null, slotDistribution);
         }
-    ], next);
+      }
+
+      getSlotDistribution();
+      
 }
 
 module.exports.countNodes = (node, next) => {
@@ -112,7 +142,7 @@ module.exports.removeMaster = (node, next) => {
 
 module.exports.reshard = (nodeTo, nodeFrom, slots, next) => {
     logCommand(`### RESHARDING FROM ${nodeFrom.host} TO ${nodeTo.host} ###\n`);
-    console.log({reshardTo: nodeTo.host, reshardFrom: nodeFrom.host, slots});
+    console.log({reshardFrom: nodeFrom.host, reshardTo: nodeTo.host, slots});
     const clusterToIdCommand = `redis-cli -h ${nodeTo.host} -p ${nodeTo.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
     const clusterFromIdCommand = `redis-cli -h ${nodeFrom.host} -p ${nodeFrom.port} CLUSTER NODES | grep myself | cut -d" " -f1`;
 
