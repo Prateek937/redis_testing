@@ -6,6 +6,7 @@ const inputs = require('./inputs');
 const min = inputs.min;
 const max = inputs.max;
 const nodes = require('./inventory.json');
+const { CLIENT_RENEG_LIMIT } = require('tls');
 
 let clusterSize;
 
@@ -78,37 +79,44 @@ function removeNodes(clusterNodes, removeCount, next) {
             slots = result; next(null);
         }),
         next => async.timesSeries(removeCount, (i, next) => {
+            console.log('a');
             async.series([
-                    next => {
-                    let distribution = [];
+                next => {
+                    console.log('b');
+                    // let distribution = [];
                     let slotsToMove = slots[`${clusterNodes[clusterSize - 1].host}:${clusterNodes[clusterSize - 1].port}`];
                     let slotsPerNode = Math.floor(slotsToMove/remainingNodes);
                     let extraSlots = slotsToMove%remainingNodes;
 
-                    for (let x = 0; x < remainingNodes; x++) {
-                        distribution.push(slotsPerNode);
-                        if (extraSlots > 0) {
-                            distribution[x] += 1;
-                            extraSlots--;
-                        }
-                    }
-                    console.log(1111, {distribution});
+                    // for (let x = 0; x < remainingNodes; x++) {
+                    //     distribution.push(slotsPerNode);
+                    //     if (extraSlots > 0) {
+                    //         distribution[x] += 1;
+                    //         extraSlots--;
+                    //     }
+                    // }
+                    // console.log(1111, {distribution});
                     
+                    let x = Math.ceil(slotsToMove/remainingNodes);
+                    let y = Math.floor(slotsToMove/remainingNodes);
+                    let distribution = Array(extraSlots).fill(x).concat(Array(remainingNodes - extraSlots).fill(y));
+                    console.log(55555, {distribution}); 
                     async.timesSeries(remainingNodes, (n, next) => {
+                        console.log('c');
                         async.series([
                             next => cluster.reshard(clusterNodes[n], clusterNodes[clusterSize - 1], distribution[n], log(next)),
                             next => wait(2, log(next)),
-                            next => cluster.check(clusterNodes[0], log(next)),
+                            // next => cluster.check(clusterNodes[0], log(next)),
                         ], next);
                     }, next);
                 },
-                (next) => async.series([
-                    next => cluster.removeMaster(clusterNodes[clusterSize - 1], log(next)),
-                    next => cluster.check(clusterNodes[0], log(next)),
-                    next => {clusterSize--; next(null);}
-                ], next)
+                next => cluster.removeMaster(clusterNodes[clusterSize - 1], log(next)),
+                next => cluster.check(clusterNodes[0], log(next)),
+                next => {clusterSize--; next(null);},
             ], next)
         }, next),
+        next => cluster.rebalance(clusterNodes[0], log(next)),
+        next => cluster.check(clusterNodes[0], log(next)),
         next => wait(65, log(next)) // wait for 60 seconds for the nodes to be re-added
     ], next);
 }
