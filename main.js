@@ -83,24 +83,12 @@ function removeNodes(clusterNodes, removeCount, next) {
             async.series([
                 next => {
                     console.log('b');
-                    // let distribution = [];
                     let slotsToMove = slots[`${clusterNodes[clusterSize - 1].host}:${clusterNodes[clusterSize - 1].port}`];
-                    let slotsPerNode = Math.floor(slotsToMove/remainingNodes);
-                    let extraSlots = slotsToMove%remainingNodes;
-
-                    // for (let x = 0; x < remainingNodes; x++) {
-                    //     distribution.push(slotsPerNode);
-                    //     if (extraSlots > 0) {
-                    //         distribution[x] += 1;
-                    //         extraSlots--;
-                    //     }
-                    // }
-                    // console.log(1111, {distribution});
-                    
                     let x = Math.ceil(slotsToMove/remainingNodes);
                     let y = Math.floor(slotsToMove/remainingNodes);
+                    let extraSlots = slotsToMove%remainingNodes;
                     let distribution = Array(extraSlots).fill(x).concat(Array(remainingNodes - extraSlots).fill(y));
-                    console.log(55555, {distribution}); 
+                    console.log({distribution}); 
                     async.timesSeries(remainingNodes, (n, next) => {
                         console.log('c');
                         async.series([
@@ -110,6 +98,7 @@ function removeNodes(clusterNodes, removeCount, next) {
                         ], next);
                     }, next);
                 },
+                next => cluster.check(clusterNodes[0], log(next)),
                 next => cluster.removeMaster(clusterNodes[clusterSize - 1], log(next)),
                 next => cluster.check(clusterNodes[0], log(next)),
                 next => {clusterSize--; next(null);},
@@ -124,7 +113,7 @@ function removeNodes(clusterNodes, removeCount, next) {
 
 function resizeCluster(clusterNodes, resizeTo, next) {
     if (resizeTo < min || resizeTo > max) return next(new Error(`resize count not in range [${min}, ${max}]`));
-    const diff = resizeTo - clusterNodes.length;
+    const diff = resizeTo - clusterSize;
     if (diff < 0) removeNodes(clusterNodes, -diff, next);
     else if (diff > 0) addNodes(clusterNodes[0], nodes.slice(clusterNodes.length, resizeTo), next);
     else next(null);
