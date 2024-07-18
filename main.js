@@ -7,6 +7,7 @@ const min = inputs.min;
 const max = inputs.max;
 const nodes = require('./inventory.json');
 const { CLIENT_RENEG_LIMIT } = require('tls');
+const { removeAllListeners } = require('process');
 
 let clusterSize;
 
@@ -56,14 +57,14 @@ function addNodes(clusterNode, nodesToAdd, next) {
         next => async.eachOfSeries(nodesToAdd, (node, index, next) => {
             async.series([
                 next => cluster.addMaster(clusterNode, node, log(next)),
-                next => wait(2, log(next))
+                next => wait(2, log(next)),
+                next => {clusterSize += 1; next(null);}
             ], next);
         }, next),
         next => wait(10, log(next)),
         next => cluster.check(clusterNode, log(next)),
         next => cluster.rebalance(nodesToAdd[0], log(next)),
         next => cluster.check(clusterNode, log(next)),
-        next => {clusterSize += 1; next(null);}
     ], next);
 }
 
@@ -79,20 +80,18 @@ function removeNodes(clusterNodes, removeCount, next) {
             slots = result; next(null);
         }),
         next => async.timesSeries(removeCount, (i, next) => {
-            console.log('a');
             async.series([
                 next => {
-                    console.log('b');
                     let slotsToMove = slots[`${clusterNodes[clusterSize - 1].host}:${clusterNodes[clusterSize - 1].port}`];
-                    let x = Math.ceil(slotsToMove/remainingNodes);
-                    let y = Math.floor(slotsToMove/remainingNodes);
+                    let ceil = Math.ceil(slotsToMove/remainingNodes);
+                    let floor = Math.floor(slotsToMove/remainingNodes);
                     let extraSlots = slotsToMove%remainingNodes;
-                    let distribution = Array(extraSlots).fill(x).concat(Array(remainingNodes - extraSlots).fill(y));
+                    let distribution = Array(extraSlots).fill(ceil).concat(Array(remainingNodes - extraSlots).fill(floor));
                     console.log({distribution}); 
                     async.timesSeries(remainingNodes, (n, next) => {
-                        console.log('c');
                         async.series([
-                            next => cluster.reshard(clusterNodes[n], clusterNodes[clusterSize - 1], distribution[n], log(next)),
+                            // the below double modulous is to balance the number of slots in nodes with a difference no more than 1.
+                            next => cluster.reshard(clusterNodes[(i + n) % remainingNodes], clusterNodes[clusterSize - 1], distribution[n], log(next)),
                             next => wait(2, log(next)),
                             // next => cluster.check(clusterNodes[0], log(next)),
                         ], next);
@@ -112,6 +111,7 @@ function removeNodes(clusterNodes, removeCount, next) {
 
 
 function resizeCluster(clusterNodes, resizeTo, next) {
+    console.log({clusterSize});
     if (resizeTo < min || resizeTo > max) return next(new Error(`resize count not in range [${min}, ${max}]`));
     const diff = resizeTo - clusterSize;
     if (diff < 0) removeNodes(clusterNodes, -diff, next);
@@ -156,10 +156,16 @@ async.waterfall([
         switch (change.type) {
             case 'init': {
                 if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes
-                if (clusterSize > 3) return resizeCluster(nodes.slice(0, clusterSize), 3, next); //resize to thee nodes
+                if (clusterSize > 3) return async.series([
+                    next => cluster.flushall(nodes.slice(0, clusterSize), log(next)),
+                    next => resizeCluster(nodes.slice(0, clusterSize), 3, next) //resize to thee nodes
+                ], next);
                 return cluster.flushall(nodes.slice(0, 3), log(next)); 
             }
-            case 'write': return cluster.writeKeys(nodes.slice(0, clusterSize), change.value, startTime, log(next));
+            case 'write': return async.series([
+                next => cluster.writeKeys(nodes.slice(0, clusterSize), change.value, startTime, log(next)),
+                next => cluster.check(nodes[0], log(next))
+            ], next);
             case 'flush': return cluster.flushall(nodes.slice(0, clusterSize), log(next));
             case 'resize': return resizeCluster(nodes.slice(0, clusterSize), change.value, next);
             default: next(`Unknown operation ${change.type}`)

@@ -16,11 +16,11 @@ module.exports.run = (command, next) => {
     }
     try {file.appendFileSync('./logs/commands.txt', command + '\n');}
     catch (err) {file.writeFileSync('./logs/commands.txt', command + '\n');}
-
     exec(command, (err, stdout, stderr) => {
-    if (stderr) return next(stderr);
-    next(null, stdout);
-})}
+        if (stderr) return next(stderr);
+        next(null, stdout);
+    });
+}
 
 module.exports.applyCommand = (command, args, next) => {
     const out = spawn(command, args);

@@ -1,0 +1,1364 @@
+cluster Size: 4
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 2494 keys | 4096 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 2515 keys | 4096 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 2495 keys | 4096 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 2496 keys | 4096 slots | 0 slaves.
+[OK] 10000 keys in 4 masters.
+0.61 keys per slot on average.
+
+Time Taken: 0.017 seconds...
+
+------------------------------------------------------------------
+
+******* init  *******
+
+{ clusterSize: 4 }
+### REBALANCING CLUSTER ON 172.31.5.120:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.120:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.012 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 2494 keys | 4096 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 2515 keys | 4096 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 2495 keys | 4096 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 2496 keys | 4096 slots | 0 slaves.
+[OK] 10000 keys in 4 masters.
+0.61 keys per slot on average.
+
+Time Taken: 0.015 seconds...
+
+{ distribution: [ 1366, 1365, 1365 ] }
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.239', slots: 1366 }
+resharded successfully!
+Time Taken: 14.103 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.176', slots: 1365 }
+resharded successfully!
+Time Taken: 10.663 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.186', slots: 1365 }
+resharded successfully!
+Time Taken: 11.825 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 3323 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 3339 keys | 5461 slots | 1 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 3338 keys | 5461 slots | 0 slaves.
+[OK] 10000 keys in 3 masters.
+0.61 keys per slot on average.
+
+Time Taken: 0.014 seconds...
+
+### REMOVING 172.31.5.120:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.120:6379 5fa4b5aa41ebf50276acf2e1dcd7b54c4227f6f0
+Removing node 5fa4b5aa41ebf50276acf2e1dcd7b54c4227f6f0 from cluster 172.31.5.120:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.024 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 3323 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 3339 keys | 5461 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 3338 keys | 5461 slots | 0 slaves.
+[OK] 10000 keys in 3 masters.
+0.61 keys per slot on average.
+
+Time Taken: 0.011 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.239:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.239:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.01 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 3323 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 3339 keys | 5461 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 3338 keys | 5461 slots | 0 slaves.
+[OK] 10000 keys in 3 masters.
+0.61 keys per slot on average.
+
+Time Taken: 0.012 seconds...
+
+waiting... 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 65.083 seconds...
+
+------------------------------------------------------------------
+
+******* write , 10000 *******
+
+### WRITING 10000 KEYS ###
+
+0.01M keys written successfully!
+Time Taken: 0.45 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 8 *******
+
+{ clusterSize: 3 }
+### ADDING 172.31.5.120:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.120:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.021 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.001 seconds...
+
+### ADDING 172.31.5.211:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.211:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.021 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.69:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.69:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.021 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.155:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.155:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.023 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.001 seconds...
+
+### ADDING 172.31.5.151:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.151:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.027 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+waiting... 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 10.014 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 6625 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 6696 keys | 5461 slots | 0 slaves.
+172.31.5.151:6379 (707648f3...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 6679 keys | 5461 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 20000 keys in 8 masters.
+1.22 keys per slot on average.
+
+Time Taken: 0.028 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.120:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.120:6379 --cluster-use-empty-masters | grep -i Rebalancing
+>>> Rebalancing across 8 nodes. Total weight = 8.00
+
+
+Time Taken: 145.239 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 0 keys | 2048 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 2502 keys | 2048 slots | 0 slaves.
+172.31.5.151:6379 (707648f3...) -> 2525 keys | 2048 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 2488 keys | 2048 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 2504 keys | 2048 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 2488 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 2474 keys | 2048 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 2521 keys | 2048 slots | 0 slaves.
+[OK] 17502 keys in 8 masters.
+1.07 keys per slot on average.
+
+Time Taken: 0.024 seconds...
+
+------------------------------------------------------------------
+
+******* write , 100000 *******
+
+### WRITING 100000 KEYS ###
+
+0.1M keys written successfully!
+Time Taken: 2.261 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 5 *******
+
+{ clusterSize: 8 }
+### REBALANCING CLUSTER ON 172.31.5.151:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.151:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.071 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 12497 keys | 2048 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 13742 keys | 2048 slots | 0 slaves.
+172.31.5.151:6379 (707648f3...) -> 13694 keys | 2048 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 13771 keys | 2048 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 13772 keys | 2048 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 13764 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 13784 keys | 2048 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 13721 keys | 2048 slots | 0 slaves.
+[OK] 108745 keys in 8 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.033 seconds...
+
+{ distribution: [ 410, 410, 410, 409, 409 ] }
+### RESHARDING FROM 172.31.5.151 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.151', reshardTo: '172.31.5.239', slots: 410 }
+resharded successfully!
+Time Taken: 6.125 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.004 seconds...
+
+### RESHARDING FROM 172.31.5.151 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.151', reshardTo: '172.31.5.176', slots: 410 }
+resharded successfully!
+Time Taken: 6.099 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.151 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.151', reshardTo: '172.31.5.186', slots: 410 }
+resharded successfully!
+Time Taken: 5.875 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.151 TO 172.31.5.120 ###
+
+{ reshardFrom: '172.31.5.151', reshardTo: '172.31.5.120', slots: 409 }
+resharded successfully!
+Time Taken: 6.839 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.151 TO 172.31.5.211 ###
+
+{ reshardFrom: '172.31.5.151', reshardTo: '172.31.5.211', slots: 409 }
+resharded successfully!
+Time Taken: 6.581 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 15237 keys | 2458 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 16461 keys | 2458 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 16504 keys | 2458 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 16535 keys | 2457 slots | 1 slaves.
+172.31.5.69:6379 (949b0686...) -> 13764 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 16523 keys | 2457 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 13721 keys | 2048 slots | 0 slaves.
+[OK] 108745 keys in 7 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.025 seconds...
+
+### REMOVING 172.31.5.151:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.151:6379 707648f3522f3363820c7bf8977aabea4f41395c
+Removing node 707648f3522f3363820c7bf8977aabea4f41395c from cluster 172.31.5.151:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.036 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 15237 keys | 2458 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 16461 keys | 2458 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 16504 keys | 2458 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 16535 keys | 2457 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 13764 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 16523 keys | 2457 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 13721 keys | 2048 slots | 0 slaves.
+[OK] 108745 keys in 7 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.022 seconds...
+
+{ distribution: [ 410, 410, 410, 409, 409 ] }
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.176', slots: 410 }
+resharded successfully!
+Time Taken: 5.505 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.186', slots: 410 }
+resharded successfully!
+Time Taken: 5.511 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.120 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.120', slots: 410 }
+resharded successfully!
+Time Taken: 5.521 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.211 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.211', slots: 409 }
+resharded successfully!
+Time Taken: 5.885 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.239', slots: 409 }
+resharded successfully!
+Time Taken: 5.505 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 17986 keys | 2867 slots | 1 slaves.
+172.31.5.186:6379 (576ba827...) -> 19211 keys | 2868 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 19268 keys | 2868 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 19252 keys | 2866 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 13764 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 19264 keys | 2867 slots | 0 slaves.
+[OK] 108745 keys in 6 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.024 seconds...
+
+### REMOVING 172.31.5.155:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.155:6379 bbc4e752b0d0ad44d7eb00191508e777b9749153
+Removing node bbc4e752b0d0ad44d7eb00191508e777b9749153 from cluster 172.31.5.155:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.033 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 17986 keys | 2867 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 19211 keys | 2868 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 19268 keys | 2868 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 19252 keys | 2866 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 13764 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 19264 keys | 2867 slots | 0 slaves.
+[OK] 108745 keys in 6 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.02 seconds...
+
+{ distribution: [ 410, 410, 410, 409, 409 ] }
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.186', slots: 410 }
+resharded successfully!
+Time Taken: 5.558 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.120 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.120', slots: 410 }
+resharded successfully!
+Time Taken: 5.873 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.211 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.211', slots: 410 }
+resharded successfully!
+Time Taken: 5.578 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.239', slots: 409 }
+resharded successfully!
+Time Taken: 5.611 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.176', slots: 409 }
+resharded successfully!
+Time Taken: 5.526 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 20725 keys | 3276 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 21950 keys | 3278 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 21995 keys | 3277 slots | 1 slaves.
+172.31.5.211:6379 (a858175e...) -> 22023 keys | 3276 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 22052 keys | 3277 slots | 0 slaves.
+[OK] 108745 keys in 5 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.02 seconds...
+
+### REMOVING 172.31.5.69:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.69:6379 949b0686a78b90ec1b6dca292617875b1b438e22
+Removing node 949b0686a78b90ec1b6dca292617875b1b438e22 from cluster 172.31.5.69:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.031 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 20725 keys | 3276 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 21950 keys | 3278 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 21995 keys | 3277 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 22023 keys | 3276 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 22052 keys | 3277 slots | 0 slaves.
+[OK] 108745 keys in 5 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.019 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.239:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.239:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.015 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 20725 keys | 3276 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 21950 keys | 3278 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 21995 keys | 3277 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 22023 keys | 3276 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 22052 keys | 3277 slots | 0 slaves.
+[OK] 108745 keys in 5 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.017 seconds...
+
+waiting... 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 65.082 seconds...
+
+------------------------------------------------------------------
+
+******* write , 10000 *******
+
+### WRITING 10000 KEYS ###
+
+0.01M keys written successfully!
+Time Taken: 0.439 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 3 *******
+
+{ clusterSize: 5 }
+### REBALANCING CLUSTER ON 172.31.5.211:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.211:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.019 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 20725 keys | 3276 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 21950 keys | 3278 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 21995 keys | 3277 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 22023 keys | 3276 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 22052 keys | 3277 slots | 0 slaves.
+[OK] 108745 keys in 5 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.023 seconds...
+
+{ distribution: [ 1092, 1092, 1092 ] }
+### RESHARDING FROM 172.31.5.211 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.211', reshardTo: '172.31.5.239', slots: 1092 }
+resharded successfully!
+Time Taken: 12.984 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.211 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.211', reshardTo: '172.31.5.176', slots: 1092 }
+resharded successfully!
+Time Taken: 13.086 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.004 seconds...
+
+### RESHARDING FROM 172.31.5.211 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.211', reshardTo: '172.31.5.186', slots: 1092 }
+resharded successfully!
+Time Taken: 13.354 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 28062 keys | 4368 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 29261 keys | 4370 slots | 1 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 29370 keys | 4369 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 22052 keys | 3277 slots | 0 slaves.
+[OK] 108745 keys in 4 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.017 seconds...
+
+### REMOVING 172.31.5.211:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.211:6379 a858175ee57e3386327fa92ce556f715d18efba0
+Removing node a858175ee57e3386327fa92ce556f715d18efba0 from cluster 172.31.5.211:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.026 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 28062 keys | 4368 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 29261 keys | 4370 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 29370 keys | 4369 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 22052 keys | 3277 slots | 0 slaves.
+[OK] 108745 keys in 4 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.015 seconds...
+
+{ distribution: [ 1093, 1092, 1092 ] }
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.176', slots: 1093 }
+resharded successfully!
+Time Taken: 11.097 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.186', slots: 1092 }
+resharded successfully!
+Time Taken: 11.281 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.239', slots: 1092 }
+resharded successfully!
+Time Taken: 10.959 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35406 keys | 5460 slots | 1 slaves.
+172.31.5.186:6379 (576ba827...) -> 36590 keys | 5462 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36749 keys | 5462 slots | 0 slaves.
+[OK] 108745 keys in 3 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.019 seconds...
+
+### REMOVING 172.31.5.120:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.120:6379 5fa4b5aa41ebf50276acf2e1dcd7b54c4227f6f0
+Removing node 5fa4b5aa41ebf50276acf2e1dcd7b54c4227f6f0 from cluster 172.31.5.120:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.027 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35406 keys | 5460 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36590 keys | 5462 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36749 keys | 5462 slots | 0 slaves.
+[OK] 108745 keys in 3 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.016 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.239:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.239:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.013 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35406 keys | 5460 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36590 keys | 5462 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36749 keys | 5462 slots | 0 slaves.
+[OK] 108745 keys in 3 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.013 seconds...
+
+waiting... 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 65.083 seconds...
+
+------------------------------------------------------------------
+
+******* write , 10000 *******
+
+### WRITING 10000 KEYS ###
+
+0.01M keys written successfully!
+Time Taken: 0.422 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 7 *******
+
+{ clusterSize: 3 }
+### ADDING 172.31.5.120:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.120:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.022 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.211:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.211:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.023 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.69:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.69:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.023 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### ADDING 172.31.5.155:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.155:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.023 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+waiting... 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 10.011 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35406 keys | 5460 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36590 keys | 5462 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36749 keys | 5462 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 108745 keys in 7 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.025 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.120:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.120:6379 --cluster-use-empty-masters | grep -i Rebalancing
+>>> Rebalancing across 7 nodes. Total weight = 7.00
+
+
+Time Taken: 127.44 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 14433 keys | 2340 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 15715 keys | 2340 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 15713 keys | 2340 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 15696 keys | 2341 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 15752 keys | 2341 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 15657 keys | 2341 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 15779 keys | 2341 slots | 0 slaves.
+[OK] 108745 keys in 7 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.022 seconds...
+
+------------------------------------------------------------------
+
+******* write , 100000 *******
+
+### WRITING 100000 KEYS ###
+
+0.1M keys written successfully!
+Time Taken: 2.107 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 6 *******
+
+{ clusterSize: 7 }
+### REBALANCING CLUSTER ON 172.31.5.155:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.155:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.036 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 14433 keys | 2340 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 15715 keys | 2340 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 15713 keys | 2340 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 15696 keys | 2341 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 15752 keys | 2341 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 15657 keys | 2341 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 15779 keys | 2341 slots | 0 slaves.
+[OK] 108745 keys in 7 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.033 seconds...
+
+{ distribution: [ 391, 390, 390, 390, 390, 390 ] }
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.239', slots: 391 }
+resharded successfully!
+Time Taken: 4.985 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.176', slots: 390 }
+resharded successfully!
+Time Taken: 4.985 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.186', slots: 390 }
+resharded successfully!
+Time Taken: 5.027 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.120 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.120', slots: 390 }
+resharded successfully!
+Time Taken: 5.647 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.211 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.211', slots: 390 }
+resharded successfully!
+Time Taken: 5.736 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.155 TO 172.31.5.69 ###
+
+{ reshardFrom: '172.31.5.155', reshardTo: '172.31.5.69', slots: 390 }
+resharded successfully!
+Time Taken: 5.251 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 17086 keys | 2731 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 18349 keys | 2730 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 18321 keys | 2730 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 18309 keys | 2731 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 18397 keys | 2731 slots | 1 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 6 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.022 seconds...
+
+### REMOVING 172.31.5.155:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.155:6379 bbc4e752b0d0ad44d7eb00191508e777b9749153
+Removing node bbc4e752b0d0ad44d7eb00191508e777b9749153 from cluster 172.31.5.155:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.034 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 17086 keys | 2731 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 18349 keys | 2730 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 18321 keys | 2730 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 18309 keys | 2731 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 18397 keys | 2731 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 6 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.021 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.239:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.239:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.017 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 17086 keys | 2731 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 18349 keys | 2730 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 18321 keys | 2730 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 18309 keys | 2731 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 18397 keys | 2731 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 6 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.02 seconds...
+
+waiting... 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 65.084 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 3 *******
+
+{ clusterSize: 6 }
+### REBALANCING CLUSTER ON 172.31.5.69:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.69:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.022 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 17086 keys | 2731 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 18349 keys | 2730 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 18321 keys | 2730 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 18309 keys | 2731 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 18397 keys | 2731 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 6 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.021 seconds...
+
+{ distribution: [ 911, 910, 910 ] }
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.239', slots: 911 }
+resharded successfully!
+Time Taken: 11.584 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.176', slots: 910 }
+resharded successfully!
+Time Taken: 12.221 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.69 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.69', reshardTo: '172.31.5.186', slots: 910 }
+resharded successfully!
+Time Taken: 12.005 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 23252 keys | 3642 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 24477 keys | 3640 slots | 1 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 24424 keys | 3640 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 18309 keys | 2731 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 5 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.025 seconds...
+
+### REMOVING 172.31.5.69:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.69:6379 949b0686a78b90ec1b6dca292617875b1b438e22
+Removing node 949b0686a78b90ec1b6dca292617875b1b438e22 from cluster 172.31.5.69:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.036 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 23252 keys | 3642 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 24477 keys | 3640 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 24424 keys | 3640 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 18309 keys | 2731 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 5 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.019 seconds...
+
+{ distribution: [ 911, 910, 910 ] }
+### RESHARDING FROM 172.31.5.211 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.211', reshardTo: '172.31.5.176', slots: 911 }
+resharded successfully!
+Time Taken: 11.438 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### RESHARDING FROM 172.31.5.211 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.211', reshardTo: '172.31.5.186', slots: 910 }
+resharded successfully!
+Time Taken: 10.182 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.211 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.211', reshardTo: '172.31.5.239', slots: 910 }
+resharded successfully!
+Time Taken: 10.424 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 29368 keys | 4552 slots | 1 slaves.
+172.31.5.186:6379 (576ba827...) -> 30595 keys | 4550 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 30499 keys | 4551 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 4 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.017 seconds...
+
+### REMOVING 172.31.5.211:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.211:6379 a858175ee57e3386327fa92ce556f715d18efba0
+Removing node a858175ee57e3386327fa92ce556f715d18efba0 from cluster 172.31.5.211:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.028 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 29368 keys | 4552 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 30595 keys | 4550 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 30499 keys | 4551 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 18283 keys | 2731 slots | 0 slaves.
+[OK] 108745 keys in 4 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.017 seconds...
+
+{ distribution: [ 911, 910, 910 ] }
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.186 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.186', slots: 911 }
+resharded successfully!
+Time Taken: 9.107 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.239 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.239', slots: 910 }
+resharded successfully!
+Time Taken: 10.676 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### RESHARDING FROM 172.31.5.120 TO 172.31.5.176 ###
+
+{ reshardFrom: '172.31.5.120', reshardTo: '172.31.5.176', slots: 910 }
+resharded successfully!
+Time Taken: 9.674 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35470 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36689 keys | 5461 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36586 keys | 5461 slots | 1 slaves.
+[OK] 108745 keys in 3 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.016 seconds...
+
+### REMOVING 172.31.5.120:6379 FROM CLUSTER ###
+
+> redis-cli --cluster del-node 172.31.5.120:6379 5fa4b5aa41ebf50276acf2e1dcd7b54c4227f6f0
+Removing node 5fa4b5aa41ebf50276acf2e1dcd7b54c4227f6f0 from cluster 172.31.5.120:6379
+Sending CLUSTER FORGET messages to the cluster...
+Sending CLUSTER RESET SOFT to the deleted node.
+
+Time Taken: 0.027 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35470 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36689 keys | 5461 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36586 keys | 5461 slots | 0 slaves.
+[OK] 108745 keys in 3 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.014 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.239:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.239:6379 --cluster-use-empty-masters | grep -i Rebalancing
+*** No rebalancing needed! All nodes are within the 2.00% threshold.
+
+
+Time Taken: 0.011 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35470 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36689 keys | 5461 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36586 keys | 5461 slots | 0 slaves.
+[OK] 108745 keys in 3 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.013 seconds...
+
+waiting... 65 64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 65.087 seconds...
+
+------------------------------------------------------------------
+
+******* resize , 8 *******
+
+{ clusterSize: 3 }
+### ADDING 172.31.5.120:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.120:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.019 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.002 seconds...
+
+### ADDING 172.31.5.211:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.211:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.019 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.69:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.69:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.073 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.155:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.155:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.021 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+### ADDING 172.31.5.151:6379 NODE TO CLUSTER ###
+
+> redis-cli --cluster add-node 172.31.5.151:6379 172.31.5.239:6379 | awk '{ gsub(/[[0-9;]*m/, ""); print }'
+node added successfully
+Time Taken: 0.027 seconds...
+
+waiting... 2 1 
+
+
+Time Taken: 2.003 seconds...
+
+waiting... 10 9 8 7 6 5 4 3 2 1 
+
+
+Time Taken: 10.013 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 35470 keys | 5462 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 36689 keys | 5461 slots | 0 slaves.
+172.31.5.151:6379 (707648f3...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 36586 keys | 5461 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 0 keys | 0 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 0 keys | 0 slots | 0 slaves.
+[OK] 108745 keys in 8 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.031 seconds...
+
+### REBALANCING CLUSTER ON 172.31.5.120:6379 ###
+
+> redis-cli --cluster rebalance 172.31.5.120:6379 --cluster-use-empty-masters | grep -i Rebalancing
+>>> Rebalancing across 8 nodes. Total weight = 8.00
+
+
+Time Taken: 163.37 seconds...
+
+### CHECK NODE 172.31.5.239:6379 ###
+
+172.31.5.239:6379 (7ac2eb74...) -> 12592 keys | 2048 slots | 0 slaves.
+172.31.5.186:6379 (576ba827...) -> 13742 keys | 2048 slots | 0 slaves.
+172.31.5.151:6379 (707648f3...) -> 13668 keys | 2048 slots | 0 slaves.
+172.31.5.176:6379 (bb36fa59...) -> 13771 keys | 2048 slots | 0 slaves.
+172.31.5.211:6379 (a858175e...) -> 13765 keys | 2048 slots | 0 slaves.
+172.31.5.69:6379 (949b0686...) -> 13621 keys | 2048 slots | 0 slaves.
+172.31.5.120:6379 (5fa4b5aa...) -> 13817 keys | 2048 slots | 0 slaves.
+172.31.5.155:6379 (bbc4e752...) -> 13769 keys | 2048 slots | 0 slaves.
+[OK] 108745 keys in 8 masters.
+6.64 keys per slot on average.
+
+Time Taken: 0.026 seconds...
+

@@ -2,6 +2,8 @@ const shell = require('./shell');
 const async = require('async');
 const Redis = require('ioredis');
 
+const nodes = require('../inventory');
+
 const float = function(...args) {
     const next = args.pop();
 	return function(err, ...results) { if (err) return next(err);
@@ -16,6 +18,31 @@ module.exports.check = (node, next) => {
     const command = `redis-cli --cluster check ${node.host}:${node.port} | grep keys | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     shell.run(command, (err, result) => err ? next(err) : next(null, result));
 }
+
+const checker = (command, handler, next) => {
+    async.waterfall([
+        next => {
+            if (preCheck) return module.exports.check(nodes[0], next);
+            next(null, undefined);
+        },
+        (check1, next) => shell.run(command, (err, result) => {
+            handler(err, result, float(check1, next));
+        }),
+        (check1, output, next) => {
+            if (check1) return module.exports.check(nodes[0], float(check1, output, next));
+            next(null, check1, output, undefined);
+        },
+        (check1, output, check2) => {
+            // comparison
+            if (check1 && check2) {
+                console.log(check1.split("\n").slice(-2)[0].split(' ').splice(-5)[0]);
+                console.log(check2.split("\n").slice(-2)[0].split(' ').splice(-5)[0]);
+            }
+            next(null, output);
+        }
+
+    ], next);
+} 
 
 module.exports.getSlots = (node, next) => {
     const redis = new Redis.Cluster([
@@ -71,11 +98,18 @@ module.exports.createCluster = (nodes, next) => {
     logCommand(`### CREATING CLUSTER OF 3 NODES ${clusterNodes} ###\n`);
     const command = `redis-cli --cluster create ${clusterNodes} --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     console.log(`> ${command}`);
-    shell.run(command, (err, result) => {
+
+    checker(command, (err, result, next) => {
         if (err) return next(err);
         if (result.includes('All nodes agree')) return next(null, 'cluster created successfully');
         next(null, result);
-    });
+    })
+
+    // shell.run(command, (err, result) => {
+    //     if (err) return next(err);
+    //     if (result.includes('All nodes agree')) return next(null, 'cluster created successfully');
+    //     next(null, result);
+    // });
 }
 
 module.exports.flushall = (nodes, next) => {
