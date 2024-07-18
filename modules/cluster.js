@@ -3,6 +3,7 @@ const async = require('async');
 const Redis = require('ioredis');
 
 const nodes = require('../inventory');
+const preCheck = true;
 
 const float = function(...args) {
     const next = args.pop();
@@ -14,10 +15,23 @@ const float = function(...args) {
 const logCommand = (text) => console.log(`\x1b[33m${text}\x1b[0m`);
 
 module.exports.check = (node, next) => {
-    logCommand(`### CHECK NODE ${node.host}:${node.port} ###\n`);
+    let log = `\x1b[33m### CHECK NODE ${node.host}:${node.port} ###\n\x1b[0m`
+    // logCommand(`### CHECK NODE ${node.host}:${node.port} ###\n`);
     const command = `redis-cli --cluster check ${node.host}:${node.port} | grep keys | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
-    shell.run(command, (err, result) => err ? next(err) : next(null, result));
+    shell.run(command, (err, result) => err ? next(log + err) : next(null, log + result));
 }
+
+const assertKeysAndSlots = (check1, check2) => {
+    if (check1 && check2) {
+        let keys1 = check1.split("\n").slice(-3)[0].split(' ').slice(-5)[0];
+        let keys2 = check2.split("\n").slice(-3)[0].split(' ').slice(-5)[0];
+        let slots1 = 0;
+        let slots2 = 0;
+        check1.split("\n").slice(1, -3).forEach(node => slots1 += parseInt(node.split(' ').slice(-5)[0]));
+        check2.split("\n").slice(1, -3).forEach(node => slots2 += parseInt(node.split(' ').slice(-5)[0]));
+        console.log(3333, {keys1, slots1, keys2, slots2});
+    }
+} 
 
 const checker = (command, handler, next) => {
     async.waterfall([
@@ -32,11 +46,9 @@ const checker = (command, handler, next) => {
             if (check1) return module.exports.check(nodes[0], float(check1, output, next));
             next(null, check1, output, undefined);
         },
-        (check1, output, check2) => {
-            // comparison
+        (check1, output, check2, next) => {
             if (check1 && check2) {
-                console.log(check1.split("\n").slice(-2)[0].split(' ').splice(-5)[0]);
-                console.log(check2.split("\n").slice(-2)[0].split(' ').splice(-5)[0]);
+                assertKeysAndSlots(check1, check2)
             }
             next(null, output);
         }
@@ -103,7 +115,7 @@ module.exports.createCluster = (nodes, next) => {
         if (err) return next(err);
         if (result.includes('All nodes agree')) return next(null, 'cluster created successfully');
         next(null, result);
-    })
+    }, next);
 
     // shell.run(command, (err, result) => {
     //     if (err) return next(err);
@@ -117,7 +129,12 @@ module.exports.flushall = (nodes, next) => {
         logCommand(`### FLUSHING DATABASE : ${node.host}:${node.port} ###`);
         const command = `redis-cli -h ${node.host} -p ${node.port} flushall`;
         console.log(`> ${command}`);
-        shell.run(command, next);
+        checker(command, (err, result, next) => {
+            if (err) return next(err);
+            next(null, result)
+        }, next);
+
+        // shell.run(command, next);
     }, (err) => {
         if (err) return next(err);
         next(null, 'cluster flushed successfully!');
@@ -128,7 +145,8 @@ module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
     logCommand(`### ADDING ${nodeToAdd.host}:${nodeToAdd.port} NODE TO CLUSTER ###\n`);
     const command = `redis-cli --cluster add-node ${nodeToAdd.host}:${nodeToAdd.port} ${clusterNode.host}:${clusterNode.port} | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     console.log(`> ${command}`);
-    shell.run(command, (err, result) => {
+
+    checker(command, (err, result, next) => {
         if (err) return next(err);
         const lines = result.split('\n');
         for (let line of lines) {
@@ -137,14 +155,25 @@ module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
         }
         next(`ERROR >>> ${result}`);
         // next(null, result)
-    });
+    }, next);
+
+    // shell.run(command, (err, result) => {
+    //     if (err) return next(err);
+    //     const lines = result.split('\n');
+    //     for (let line of lines) {
+    //         if (line.includes("added")) return next(null, `node added successfully`);
+    //         // if (line.includes("added")) return next(null, line);
+    //     }
+    //     next(`ERROR >>> ${result}`);
+    //     // next(null, result)
+    // });
 }
 
 module.exports.rebalance = (node, next) => {
     logCommand(`### REBALANCING CLUSTER ON ${node.host}:${node.port} ###\n`);
     const command = `redis-cli --cluster rebalance ${node.host}:${node.port} --cluster-use-empty-masters | grep -i Rebalancing`;
     console.log(`> ${command}`)
-    shell.run(command, (err, result) => {
+    checker(command, (err, result, next) => {
         if (err) return next(err);
         next(null, `${result}\n`)
         // const lines = result.split('\n');
@@ -153,7 +182,18 @@ module.exports.rebalance = (node, next) => {
         //     if (line.includes("No rebalancing needed!")) return next(null, line+'\n');
         // }
         // next(`ERROR >>> ${result}`);
-    });
+    }, next);
+
+    // shell.run(command, (err, result) => {
+    //     if (err) return next(err);
+    //     next(null, `${result}\n`)
+    //     // const lines = result.split('\n');
+    //     // for (let line of lines) {
+    //     //     if (line.includes("Rebalancing")) return next(null, 'rebalanced successfully!\n');
+    //     //     if (line.includes("No rebalancing needed!")) return next(null, line+'\n');
+    //     // }
+    //     // next(`ERROR >>> ${result}`);
+    // });
 }
 
 module.exports.removeMaster = (node, next) => {
@@ -165,7 +205,9 @@ module.exports.removeMaster = (node, next) => {
             // const resultCommand = `redis-cli -h ${node} -p ${port} cluster forget ${nodeId}`;
             const resultCommand = `redis-cli --cluster del-node ${node.host}:${node.port} ${nodeId}`;
             console.log(`> ${resultCommand}`);
-            shell.run(resultCommand, (err, result) => err ? next(err) : next(null, result.trim()));
+            checker(resultCommand, (err, result, next) => err ? next(err) : next(null, result.trim()), next);
+
+            // shell.run(resultCommand, (err, result) => err ? next(err) : next(null, result.trim()));
         }
     ],  (err, result) => {
         if(err) return next(err);
@@ -185,7 +227,9 @@ module.exports.reshard = (nodeTo, nodeFrom, slots, next) => {
         (clusterToId, next) => shell.run(clusterFromIdCommand, float(clusterToId, next)),
         (clusterToId, clusterFromId, next) => {
             const finalCommand = `redis-cli --cluster reshard ${nodeFrom.host}:${nodeFrom.port} --cluster-from ${clusterFromId.trim()} --cluster-to ${clusterToId.trim()} --cluster-slots ${slots} --cluster-yes | grep Ready`;
-            shell.run(finalCommand, (err, result) => err ? next(err) : next(null, 'resharded successfully!'));
+            checker(finalCommand, (err, result, next) => err ? next(err) : next(null, 'resharded successfully!'), next);
+            
+            // shell.run(finalCommand, (err, result) => err ? next(err) : next(null, 'resharded successfully!'));
         }
     ], next);
 }
@@ -193,9 +237,16 @@ module.exports.reshard = (nodeTo, nodeFrom, slots, next) => {
 module.exports.writeKeys = (clusterNodes, keyCount, startTime, next) => {
     logCommand(`### WRITING ${keyCount} KEYS ###\n`);
     const cluster = new Redis.Cluster(clusterNodes);
-    const atOnce = keyCount < 1000000 ? keyCount : 1000000
-    async.timesSeries(keyCount/atOnce, (i, next) => 
-        async.times(atOnce, (j, next) => {
+    const atOnce = keyCount < 10000 ? keyCount : 10000
+    let check1 = '';
+    let check2 = '';
+    async.series([
+        next => module.exports.check(nodes[0], (err, result) => {
+            if (err) return next(err);
+            check1 = result;
+            next(null, result);
+        }),
+        next => async.timesSeries(keyCount/atOnce, (i, next) => async.times(atOnce, (j, next) => {
             let key   = `${startTime}${j+i*atOnce}`;
             let value = `${startTime}${j+i*atOnce}`;
             cluster.set(key, value, (err, result) => {
@@ -203,14 +254,23 @@ module.exports.writeKeys = (clusterNodes, keyCount, startTime, next) => {
                 console.error(`Error setting ${key}:`, err);
                 return next(err);
                 }
-                // console.log(`${key} set successfully:`, result);
                 next(null, result);
-            })
-        }, (err, result) => {
-            next(err, `${i}M keys written successfully!`)
-    }), (err, result) => {
-        cluster.quit();
-        next(err, `${keyCount/1000000}M keys written successfully!`)
-    });
+            });
+        }, next), (err, result) => {
+            cluster.quit();
+            if (err) return next(err);
+            next(err, `${keyCount/1000000}M keys written successfully!`)
+        }),
+        next => module.exports.check(nodes[0], (err, result) => {
+            if (err) return next(err);
+            check2 = result;
+            next(null, result);
+        }),
+        next => {
+            assertKeysAndSlots(check1, check2);
+            next(null)
+        }
+    ], (err, results) => {next(err, results[1])});
+    ;
 }
 

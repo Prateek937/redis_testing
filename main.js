@@ -163,7 +163,7 @@ async.waterfall([
                 return cluster.flushall(nodes.slice(0, 3), log(next)); 
             }
             case 'write': return async.series([
-                next => cluster.writeKeys(nodes.slice(0, clusterSize), change.value, startTime, log(next)),
+                next => cluster.writeKeys(nodes.slice(0, clusterSize), change.value, Date.now(), log(next)),
                 next => cluster.check(nodes[0], log(next))
             ], next);
             case 'flush': return cluster.flushall(nodes.slice(0, clusterSize), log(next));
