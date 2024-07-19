@@ -6,8 +6,7 @@ const inputs = require('./inputs');
 const min = inputs.min;
 const max = inputs.max;
 const nodes = require('./inventory.json');
-const { CLIENT_RENEG_LIMIT } = require('tls');
-const { removeAllListeners } = require('process');
+
 
 let clusterSize;
 
@@ -62,9 +61,9 @@ function addNodes(clusterNode, nodesToAdd, next) {
             ], next);
         }, next),
         next => wait(10, log(next)),
-        next => cluster.check(clusterNode, log(next)),
+        // next => cluster.check(clusterNode, log(next)),
         next => cluster.rebalance(nodesToAdd[0], log(next)),
-        next => cluster.check(clusterNode, log(next)),
+        // next => cluster.check(clusterNode, log(next)),
     ], next);
 }
 
@@ -74,7 +73,7 @@ function removeNodes(clusterNodes, removeCount, next) {
     let slots;
     async.series([
         next => cluster.rebalance(clusterNodes[clusterSize - 1], log(next)),
-        next => cluster.check(clusterNodes[0], log(next)),
+        // next => cluster.check(clusterNodes[0], log(next)),
         next => cluster.getSlots(clusterNodes[clusterSize - 1], (err, result) => {
             if (err) return next(err);
             slots = result; next(null);
@@ -91,20 +90,20 @@ function removeNodes(clusterNodes, removeCount, next) {
                     async.timesSeries(remainingNodes, (n, next) => {
                         async.series([
                             // the below double modulous is to balance the number of slots in nodes with a difference no more than 1.
-                            next => cluster.reshard(clusterNodes[(i + n) % remainingNodes], clusterNodes[clusterSize - 1], distribution[n], log(next)),
+                            next => cluster.reshard(clusterNodes[(i + n) % remainingNodes], clusterNodes[clusterSize - 1], distribution[n], n == remainingNodes - 1, log(next)),
                             next => wait(2, log(next)),
                             // next => cluster.check(clusterNodes[0], log(next)),
                         ], next);
                     }, next);
                 },
-                next => cluster.check(clusterNodes[0], log(next)),
+                // next => cluster.check(clusterNodes[0], log(next)),
                 next => cluster.removeMaster(clusterNodes[clusterSize - 1], log(next)),
-                next => cluster.check(clusterNodes[0], log(next)),
+                // next => cluster.check(clusterNodes[0], log(next)),
                 next => {clusterSize--; next(null);},
             ], next)
         }, next),
         next => cluster.rebalance(clusterNodes[0], log(next)),
-        next => cluster.check(clusterNodes[0], log(next)),
+        // next => cluster.check(clusterNodes[0], log(next)),
         next => wait(65, log(next)) // wait for 60 seconds for the nodes to be re-added
     ], next);
 }
@@ -127,16 +126,14 @@ function createCluster(clusterNodes, next) {
             console.log(result);
             next(null, result);
         }),
-        next => cluster.check(clusterNodes[0], log(next))
+        // next => cluster.check(clusterNodes[0], log(next))
     ], next);
 }
 
 function log(next) {
-    const st1 = Date.now();
     return (err, ...args) => {
         if (err) return next(err);
         console.log(...args);
-        printTime(Date.now() - st1);
         next(null, ...args);
     }
 }
@@ -148,30 +145,38 @@ async.waterfall([
         clusterSize = result;
         console.log(`cluster Size: ${clusterSize}`);
         if (clusterSize > 1) return cluster.check(nodes[0], log(next));
-        next(null);
+        next(null, undefined);
     },
-    next => async.eachOfSeries(inputs.changes, (change, key, next) => {
+    (ignore, next) => async.eachOfSeries(inputs.changes, (change, key, next) => {
         console.log('------------------------------------------------------------------');
         console.log(`\n${blue}******* ${change.type} ${change.value === undefined ? '' : ', ' + change.value} *******${reset}\n` );
-        switch (change.type) {
-            case 'init': {
-                if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes
-                if (clusterSize > 3) return async.series([
-                    next => cluster.flushall(nodes.slice(0, clusterSize), log(next)),
-                    next => resizeCluster(nodes.slice(0, clusterSize), 3, next) //resize to thee nodes
-                ], next);
-                return cluster.flushall(nodes.slice(0, 3), log(next)); 
+        async.series([
+            next => {
+                switch (change.type) {
+                    case 'init': {
+                        if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes
+                        if (clusterSize > 3) return async.series([
+                            next => cluster.flushall(nodes.slice(0, clusterSize), log(next)),
+                            next => resizeCluster(nodes.slice(0, clusterSize), 3, next) //resize to thee nodes
+                        ], next);
+                        return cluster.flushall(nodes.slice(0, 3), log(next)); 
+                    }
+                    case 'write': return async.series([
+                        next => cluster.writeKeys(nodes.slice(0, clusterSize), change.value, Date.now(), log(next)),
+                        // next => cluster.check(nodes[0], log(next))
+                    ], next);
+                    case 'flush': return cluster.flushall(nodes.slice(0, clusterSize), log(next));
+                    case 'resize': return resizeCluster(nodes.slice(0, clusterSize), change.value, next);
+                    default: next(`Unknown operation ${change.type}`)
+                };
+            },
+            next => {
+                console.log(`\n${blue}******* ${change.type} ${change.value === undefined ? '' : ', ' + change.value} completed ******* ${reset} \n` );
+                next(null);
             }
-            case 'write': return async.series([
-                next => cluster.writeKeys(nodes.slice(0, clusterSize), change.value, Date.now(), log(next)),
-                next => cluster.check(nodes[0], log(next))
-            ], next);
-            case 'flush': return cluster.flushall(nodes.slice(0, clusterSize), log(next));
-            case 'resize': return resizeCluster(nodes.slice(0, clusterSize), change.value, next);
-            default: next(`Unknown operation ${change.type}`)
-        }
+        ], next);
     }, next)
-], (...args) => {
+], () => {
     printTime(Date.now() - startTime);
-    console.log('---DONE---', ...args);
+    console.log('---DONE---');
 });
