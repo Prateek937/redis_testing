@@ -16,6 +16,7 @@ module.exports.run = (command, next) => {
     }
     try {file.appendFileSync('./logs/commands.txt', command + '\n');}
     catch (err) {file.writeFileSync('./logs/commands.txt', command + '\n');}
+    console.log(`> ${command}`);
     exec(command, (err, stdout, stderr) => {
         if (stderr) return next(stderr);
         next(null, stdout);

@@ -8,6 +8,7 @@ variable "max" {
 resource "aws_instance" "redis" {
   count                  = var.max
   ami                    = "ami-007020fd9c84e18c7"
+  # instance_type          = "t2.xlarge"
   instance_type          = "t2.medium"
   subnet_id              = "subnet-07c5918859d627e1e"
   vpc_security_group_ids = ["sg-1e994361"]

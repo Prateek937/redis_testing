@@ -20,7 +20,7 @@ module.exports.check = (node, next) => {
     // logCommand(`### CHECK NODE ${node.host}:${node.port} ###\n`);
     const command = `redis-cli --cluster check ${node.host}:${node.port} | grep keys | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
     shell.run(command, (err, result) => err ? next(log + err) : next(null, log + result));
-}
+};
 
 const assert = (flush, keys, nodes, check1, check2) => {
     let keys1 = parseInt(check1.split("\n").slice(-3)[0].split(' ').slice(-5)[0]);
@@ -116,7 +116,6 @@ module.exports.createCluster = (nodes, next) => {
     nodes.forEach(node => clusterNodes += ` ${node.host}:${node.port}`); // creating a space separated list of nodes
     logCommand(`### CREATING CLUSTER OF 3 NODES ${clusterNodes} ###\n`);
     const command = `redis-cli --cluster create ${clusterNodes} --cluster-replicas 0 --cluster-yes | grep OK | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
-    console.log(`> ${command}`);
 
     checker(command, (err, result, next) => {
         if (err) return next(err);
@@ -129,7 +128,6 @@ module.exports.flushall = (nodes, next) => {
     async.eachOf(nodes, (node, nodeName, next) => {
         logCommand(`### FLUSHING DATABASE : ${node.host}:${node.port} ###`);
         const command = `redis-cli -h ${node.host} -p ${node.port} flushall`;
-        console.log(`> ${command}`);
         checker(command, (err, result, next) => {
             if (err) return next(err);
             next(null, result)
@@ -143,8 +141,6 @@ module.exports.flushall = (nodes, next) => {
 module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
     logCommand(`### ADDING ${nodeToAdd.host}:${nodeToAdd.port} NODE TO CLUSTER ###\n`);
     const command = `redis-cli --cluster add-node ${nodeToAdd.host}:${nodeToAdd.port} ${clusterNode.host}:${clusterNode.port} | awk '{ gsub(/\x1b\[[0-9;]*m/, ""); print }'`;
-    console.log(`> ${command}`);
-
     checker(command, (err, result, next) => {
         if (err) return next(err);
         const lines = result.split('\n');
@@ -160,7 +156,6 @@ module.exports.addMaster = (clusterNode, nodeToAdd, next) => {
 module.exports.rebalance = (node, next) => {
     logCommand(`### REBALANCING CLUSTER ON ${node.host}:${node.port} ###\n`);
     const command = `redis-cli --cluster rebalance ${node.host}:${node.port} --cluster-use-empty-masters | grep -i Rebalancing`;
-    console.log(`> ${command}`)
     checker(command, (err, result, next) => {
         if (err) return next(err);
         next(null, `${result}\n`)
@@ -177,7 +172,6 @@ module.exports.removeMaster = (node, next) => {
         (nodeId, next) => {
             // const resultCommand = `redis-cli -h ${node} -p ${port} cluster forget ${nodeId}`;
             const resultCommand = `redis-cli --cluster del-node ${node.host}:${node.port} ${nodeId}`;
-            console.log(`> ${resultCommand}`);
             checker(resultCommand, (err, result, next) => err ? next(err) : next(null, result.trim()), false, 0, 0, next); // nodeCount is 0 becuase it is already decreased in the reshard.
 
             // shell.run(resultCommand, (err, result) => err ? next(err) : next(null, result.trim()));
@@ -228,10 +222,7 @@ module.exports.writeKeys = (clusterNodes, keyCount, startTime, next) => {
                 }
                 next(null);
             });
-        }, err => {
-            // console.log(`${atOnce} keys written`);
-            next(null);
-        }), (err) => {
+        }, next), (err) => {
             cluster.quit();
             if (err) return next(err);
             next(err, `${keyCount/1000000}M keys written successfully`);
