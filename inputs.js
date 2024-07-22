@@ -2,9 +2,8 @@ module.exports.min = 3;
 module.exports.max = 8;
 module.exports.changes = [
     // { type: "init", },
-    // {type: "write", value: 30000},
-    // {type: "resize", value: 4},
-    
+    // { type: "write", value: 30000},
+    // { type: "resize", value: 4 },
     { type: "init", },
     { type: "write", value: 500000},
     { type: "resize", value: 8 }, 
