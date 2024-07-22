@@ -1,0 +1,20 @@
+when losing keys during reshard
+	do we lose keys from the source
+	do we lose keys from the target
+	do we lose keys from the others
+	on which iteration do we lose keys
+	do we ever lose keys from more than one node?
+
+Given the order of nodes in the check, note 
+	the source node number,
+	the target node number
+	the lost from node number
+
+when losing keys during rebalancing
+	which was the previous size change 
+
+when losing keys during an action 
+	what was the previous action
+
+inc: add, rebalance
+dec: rebalance, reshard, remove
