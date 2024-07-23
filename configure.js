@@ -1,10 +1,10 @@
 const file = require('fs');
-const {run} = require('../modules/shell');
+const {run} = require('./modules/shell');
 const async = require('async');
 
 const ansibleLogs = `./logs/ansible`;
-const inventory = `./terraform/multiple/${process.argv[2]}/inventory.json`;
-const inventoryRaw = `./terraform/multiple/${process.argv[2]}/inventory_raw.json`;
+const inventory = `./infra/terraform/multiple/${process.argv[2]}/inventory.json`;
+const inventoryRaw = `./infra/terraform/multiple/${process.argv[2]}/inventory_raw.json`;
 
 const processInventory = {
     aws: next => {
@@ -44,7 +44,7 @@ const runAnsible = (nodes, next) => {
             },
             next => run(`echo "run" > "${ansibleLogs}/${item.public_ip}"`, next),
             next => run(`ssh-keygen -F "${item.public_ip}" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${item.public_ip}"`, next),
-            next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, (err, result)=>{
+            next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./infra/ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, (err, result)=>{
                 if (err) next(err);
                 console.log(result);
                 next(null);

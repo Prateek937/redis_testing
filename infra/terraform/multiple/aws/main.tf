@@ -20,7 +20,7 @@ resource "aws_instance" "redis" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("../../../redisaws.pem")
+    private_key = file("../../../../redisaws.pem")
     host        = self.public_ip
   }
 
