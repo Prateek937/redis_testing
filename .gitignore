@@ -53,14 +53,8 @@ Thumbs.db
 *provider*
 *.hcl
 *.terraform*
-infra/terraform/multiple/inventory.json
-infra/terraform/multiple/inventory_raw.json
-
 infra/terraform/multiple/gcp/terraform_gcp.json
 infra/terraform/multiple/ansible_output/*
 infra/terraform/multiple/aws/inventory_raw.json
-infra/terraform/multiple/aws/inventory.json
-infra/terraform/multiple/gcp/inventory.json
+inventory.json
 infra/logs/
-
-infra/terraform/multiple/aws/inventory.json

@@ -153,7 +153,7 @@ async.waterfall([
         async.series([
             next => {
                 switch (change.type) {
-                    case 'init': {
+                    case 'init': { // resizes the cluster to size 3 or creates it.
                         if (clusterSize < 3) return createCluster(nodes.slice(0, 3), next); // create cluster of three nodes
                         if (clusterSize > 3) return async.series([
                             next => cluster.flushall(nodes.slice(0, clusterSize), log(next)),
