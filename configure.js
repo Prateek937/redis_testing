@@ -43,12 +43,19 @@ const runAnsible = (nodes, next) => {
                 next(null);
             },
             next => run(`echo "run" > "${ansibleLogs}/${item.public_ip}"`, next),
-            next => run(`ssh-keygen -F "${item.public_ip}" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${item.public_ip}"`, next),
-            next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./infra/ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, (err, result)=>{
-                if (err) next(err);
-                console.log(result);
-                next(null);
-            })
+            // next => run(`ssh-keygen -F "${item.public_ip}" && ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${item.public_ip}"`, next),
+            next => {
+                let cb = (err, result)=>{
+                    if (err) next(err);
+                    console.log(result);
+                    next(null);
+                };
+                if (process.argv[3] == "update")
+                    run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./infra/ansible/multiple/redis.yml --skip-tags "installation" --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, cb);
+                else
+                    run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./infra/ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, cb)
+            },
+            // next => run(`tmux new-session -d "ANSIBLE_HOST_KEY_CHECKING=FALSE ansible-playbook -i '${item.public_ip},' -u ubuntu --private-key ./redis${process.argv[2]}.pem ./infra/ansible/multiple/redis.yml --extra-vars "cloud=${process.argv[2]}">> '${ansibleLogs}/${item.public_ip}'"`, cb)
         ], next);
     }, next);
 }

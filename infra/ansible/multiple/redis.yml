@@ -9,6 +9,8 @@
   - redis_path: "/home/ubuntu/redis-stable"
   - home: "/home/ubuntu"
   - change_lines:
+    - key: '# save ""'
+      value: 'save 60 1000'
     - key: "# cluster-enabled yes"
       value: "cluster-enabled yes"
     - key: "# cluster-node-timeout 15000"
@@ -74,28 +76,38 @@
     get_url:
       url: "{{redis_url}}"
       dest: "{{rediszip_path}}"
+    tags:
+      - installation
 
   - name: "Extract Package {{rediszip_path}}"
     unarchive:
       src: "{{rediszip_path}}"
       dest: "{{home}}"
       remote_src: yes
+    tags:
+      - installation
 
   - name: Run make distclean
     command: make distclean
     args:
       chdir: "{{redis_path}}"
+    tags:
+      - installation
 
   - name: make distclean target
     make:
       chdir: "{{redis_path}}"
       target: distclean
     ignore_errors: true
+    tags:
+      - installation
 
   - name: run make 
     make:
       chdir: "{{redis_path}}"
     ignore_errors: true
+    tags:
+      - installation
 
   - name: make install
     make:
@@ -103,6 +115,8 @@
       target: install
     become: true
     ignore_errors: true
+    tags:
+      - installation
 
   - name: Generate dummy configation files
     copy:
@@ -110,6 +124,8 @@
       dest: "{{redis_path}}/{{item.keys() | first }}"
       remote_src: true
     loop: "{{config_files }}"
+    tags:
+      - installation
 
   - name: Cofiguring redis common configurations
     lineinfile: 
@@ -135,19 +151,9 @@
       backrefs: yes
     loop: "{{ config_files }}"
 
-  # - name: Start redis instances
-  #   shell: "{{redis_path}}/src/redis-server {{redis_path}}/{{item.keys() | first }} --daemonize yes"
-  #   loop: "{{ config_files }}"
-  #   ignore_errors: true
-
-  # - name: stop server
-  #   shell: redis-cli -h 127.0.0.1 -p 6379 shutdown
-  #   ignore_errors: true
+  - name: stop server
+    shell: redis-cli -h 127.0.0.1 -p 6379 shutdown
+    ignore_errors: true
     
   - name: starting single server
     shell: "{{redis_path}}/src/redis-server {{redis_path}}/redis1.conf --daemonize yes"
-  
-  # - name: Create the cluster
-  #   shell: "redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381  --cluster-replicas 0 --cluster-yes"
-
-

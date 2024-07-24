@@ -57,4 +57,4 @@ infra/terraform/multiple/gcp/terraform_gcp.json
 infra/terraform/multiple/ansible_output/*
 infra/terraform/multiple/aws/inventory_raw.json
 inventory.json
-infra/logs/
+logs/
